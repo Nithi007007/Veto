@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ─── Backend: build + push to Render ───
+  deploy-backend:
+    name: Deploy Backend to Render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        working-directory: backend
+        run: |
+          docker build -t veto-backend .
+
+      - name: Trigger Render deploy hook
+        if: env.RENDER_DEPLOY_HOOK_URL != ''
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "✓ Render deploy triggered"
+
+  # ─── Frontend: build check ───
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: https://veto-backend.onrender.com
+          NEXT_PUBLIC_SUI_NETWORK: testnet
+        run: npm run build
+
+      - name: Trigger Vercel deploy
+        if: env.VERCEL_DEPLOY_HOOK_URL != ''
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          curl -X POST "$VERCEL_DEPLOY_HOOK_URL"
+          echo "✓ Vercel deploy triggered"
+
+  # ─── Contracts: build check ───
+  build-contracts:
+    name: Build Move Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Sui CLI
+        run: |
+          curl -L https://github.com/MystenLabs/sui/releases/latest/download/sui-mainnet-v1.0.0-ubuntu-x86_64.tgz -o sui.tgz
+          tar -xzf sui.tgz
+          sudo mv sui /usr/local/bin/
+
+      - name: Build Move module
+        working-directory: contracts
+        run: sui move build --path .

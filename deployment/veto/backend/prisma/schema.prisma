@@ -1,0 +1,52 @@
+// Veto — Prisma schema (PostgreSQL for production)
+// Use Neon (free tier): https://neon.tech
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Rule {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // "MAX_AMOUNT_PER_TX" | "DAILY_SPEND_CAP" | "ALLOWED_RECIPIENT" | "DENYLIST_ADDRESS"
+  config    Json
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+model AgentRequest {
+  id           String   @id @default(cuid())
+  rawMessage   String
+  parsedIntent Json?
+  amountSui    Float?
+  recipient    String?
+  status       String   @default("PENDING") // PENDING | APPROVED | BLOCKED | EXECUTED | FAILED | AWAITING_CONFIRMATION
+  failedRule   String?
+  failReason   String?
+  txDigest     String?
+  confirmedAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([recipient])
+  @@index([status, amountSui, recipient, rawMessage, confirmedAt])
+}
+
+model RuleBookCommit {
+  id          String   @id @default(cuid())
+  commitHash  String
+  version     Int
+  txDigest    String?
+  createdAt   DateTime @default(now())
+
+  @@index([version])
+}

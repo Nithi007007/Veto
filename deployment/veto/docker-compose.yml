@@ -1,0 +1,95 @@
+# Veto — Docker Compose for local development
+# Runs all services: backend + frontend + PostgreSQL + Redis
+#
+# Usage:
+#   docker-compose up -d
+#
+# Then:
+#   Backend:  http://localhost:10000
+#   Frontend: http://localhost:3000
+#   Postgres: localhost:5432
+#   Redis:    localhost:6379
+
+version: "3.9"
+
+services:
+  # ─── PostgreSQL ───
+  postgres:
+    image: postgres:16-alpine
+    container_name: veto-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: veto
+      POSTGRES_USER: veto
+      POSTGRES_PASSWORD: veto-dev-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - veto-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veto"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── Redis ───
+  redis:
+    image: redis:7-alpine
+    container_name: veto-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - veto-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── Backend ───
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: veto-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://veto:veto-dev-password@postgres:5432/veto?schema=public
+      REDIS_URL: redis://redis:6379
+      RPC_URL: https://fullnode.testnet.sui.io
+      PRIVATE_KEY: ${PRIVATE_KEY:-suiprivkey1qplaceholder}
+      PACKAGE_ID: ${PACKAGE_ID:-}
+      NETWORK: testnet
+      PORT: 10000
+      OWNER_PASSWORD: ${OWNER_PASSWORD:-dev-owner-password}
+      OWNER_TOKEN: ${OWNER_TOKEN:-dev-owner-token}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "10000:10000"
+
+  # ─── Frontend ───
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: veto-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:10000
+      NEXT_PUBLIC_SUI_NETWORK: testnet
+      NEXT_PUBLIC_PACKAGE_ID: ${PACKAGE_ID:-}
+    ports:
+      - "3000:3000"
+
+volumes:
+  veto-pg-data:
+  veto-redis-data:

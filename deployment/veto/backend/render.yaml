@@ -1,0 +1,37 @@
+# Render deployment config for Veto backend
+# Docs: https://render.com/docs/blueprint-spec
+# Create a new Web Service from this file on Render.
+
+services:
+  - type: web
+    name: veto-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Set manually: Neon Postgres connection string
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false  # Set manually: Upstash Redis REST URL
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false  # Set manually: Upstash Redis REST token
+      - key: RPC_URL
+        value: https://fullnode.testnet.sui.io
+      - key: PRIVATE_KEY
+        sync: false  # Set manually: agent's Ed25519 private key
+      - key: PACKAGE_ID
+        sync: false  # Set after deploying Move contracts
+      - key: NETWORK
+        value: testnet
+      - key: PORT
+        value: 10000
+      - key: OWNER_PASSWORD
+        sync: false  # Set manually: strong password
+      - key: OWNER_TOKEN
+        sync: false  # Set manually: bearer token for API clients
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Set manually: sk-ant-xxx...
+      - key: CORS_ORIGINS
+        sync: false  # Set manually: https://your-app.vercel.app
