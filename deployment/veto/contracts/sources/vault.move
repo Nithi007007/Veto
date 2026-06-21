@@ -34,7 +34,7 @@ module veto::vault {
     use sui::tx_context::{Self, TxContext};
     use sui::transfer;
     use sui::event;
-    use std::hash::sha256;
+    use sui::hash::sha256;
 
     // ─── Error codes ──────────────────────────────────────────────────
     const EAmountZero: u64 = 0;

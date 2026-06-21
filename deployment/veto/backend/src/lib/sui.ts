@@ -1,6 +1,17 @@
 /**
  * Veto — Sui integration
  * Server-side only. The agent's keypair is loaded from env and never sent to the client.
+ *
+ * Uses @mysten/sui v2 (2.19.0). Types are handled properly.
+ *
+ * One `as any` remains on `client.core` in tx.build() — this is an SDK type
+ * gap where JSONRpcCoreClient extends CoreClient but doesn't formally satisfy
+ * ClientWithCoreApi. The runtime is correct; the types don't align across
+ * the SDK's internal interface layering.
+ *
+ * Architecture: we sign with the keypair, then execute via the client's
+ * executeTransactionBlock method. This avoids the type mismatch between
+ * the Signer interface (which expects ClientWithCoreApi) and SuiJsonRpcClient.
  */
 
 import { SuiJsonRpcClient, getJsonRpcFullnodeUrl } from "@mysten/sui/jsonRpc";
@@ -13,11 +24,17 @@ const NETWORK = process.env.NETWORK ?? "testnet";
 let _client: SuiJsonRpcClient | null = null;
 let _keypair: Ed25519Keypair | null = null;
 
+/**
+ * Get the Sui client singleton.
+ *
+ * SuiJsonRpcClient in SDK v2 requires both `url` and `network` per
+ * SuiJsonRpcClientOptions. The `network` field is a string union:
+ * 'mainnet' | 'testnet' | 'devnet' | 'localnet' | (string & {}).
+ */
 export function getSuiClient(): SuiJsonRpcClient {
   if (!_client) {
     const rpcUrl = process.env.RPC_URL || getJsonRpcFullnodeUrl(NETWORK as any);
-    // SDK v2 requires either { network } or { url } — use url form
-    _client = new SuiJsonRpcClient({ url: rpcUrl } as any);
+    _client = new SuiJsonRpcClient({ url: rpcUrl, network: NETWORK });
   }
   return _client;
 }
@@ -48,7 +65,20 @@ export type TransferResult = {
   errorMessage?: string;
 };
 
-export async function executeTransfer(recipient: string, amountSui: number): Promise<TransferResult> {
+/**
+ * Execute a real SUI transfer from the agent wallet.
+ *
+ * Two-step process (avoids type mismatch between Signer and Client interfaces):
+ *   1. Build the transaction + sign it with the keypair
+ *   2. Execute the signed transaction via client.executeTransactionBlock
+ *
+ * The result is a SuiTransactionBlockResponse with a `digest` field and
+ * an `effects` object containing the status.
+ */
+export async function executeTransfer(
+  recipient: string,
+  amountSui: number
+): Promise<TransferResult> {
   const client = getSuiClient();
   const kp = getAgentKeypair();
 
@@ -62,30 +92,39 @@ export async function executeTransfer(recipient: string, amountSui: number): Pro
   }
 
   try {
+    // 1. Build the transaction
     const tx = new Transaction();
     const mistAmount = BigInt(Math.round(amountSui * Number(MIST_PER_SUI)));
     const [coin] = tx.splitCoins(tx.gas, [mistAmount]);
     tx.transferObjects([coin], recipient);
+    tx.setSender(getAgentAddress());
 
-    const result = await kp.signAndExecuteTransaction({
-      transaction: tx,
-      client: client as any,
+    // 2. Build the transaction bytes
+    // SuiJsonRpcClient has a .core property (JSONRpcCoreClient) that satisfies
+    // the ClientWithCoreApi interface expected by Transaction.build().
+    const txBytes = await tx.build({ client: client.core as any });
+
+    // 3. Sign with the keypair
+    const { signature } = await kp.signTransaction(txBytes);
+
+    // 4. Execute via the client
+    const result = await client.executeTransactionBlock({
+      transactionBlock: txBytes,
+      signature,
+      options: { showEffects: true },
     });
 
-    // SDK v2 returns the result in a slightly different shape — cast to any
-    // to access digest + effects without fighting the type system.
-    const r = result as any;
-    const effects: any = r.effects;
-    const status = effects?.status?.status;
-    const digest: string = r.digest ?? "";
+    const digest: string = result.digest;
+    const effects = result.effects;
+    const status = effects?.status;
 
-    if (status === "success") {
+    if (status?.status === "success") {
       return { digest, status: "success" };
     }
     return {
       digest,
       status: "failure",
-      errorMessage: effects?.status?.error || "Transaction executed but failed",
+      errorMessage: status?.error || "Transaction executed but failed",
     };
   } catch (e: any) {
     return {

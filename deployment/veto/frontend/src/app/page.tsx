@@ -489,7 +489,7 @@ function RulesTab({ rules, vault, commit, tamper, ownerAuth, onLoginClick, onRef
             </div>
           )}
           <Separator />
-          {rules.length === 0 ? <div className="py-12 text-center text-sm text-muted-foreground">No rules yet.</div> : rules.map(rule => {
+          {rules.length === 0 ? <div className="py-12 text-center text-sm text-muted-foreground">No rules yet.</div> : rules.map((rule: Rule) => {
             const cfg = parseConfig(rule.config);
             let summary = "";
             if (rule.type === "MAX_AMOUNT_PER_TX") summary = `Block above ${cfg.maxAmountSui} SUI`;
