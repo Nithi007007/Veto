@@ -390,3 +390,33 @@ Stage Summary:
 - Structure: Cover (p1) → TOC (p2) → 12 chapters spanning pp 3-25
 - Key recommendation: Build for Walrus track ($35K prize), ship "AgentVault" — AI agent with persistent on-chain memory on Walrus (via MemWal SDK), zkLogin auth, sponsored transactions for gasless UX
 - Includes: hour-by-hour 24h build plan, submission checklist, 30-day post-hackathon mainnet path
+
+---
+Task ID: VETO-BUILD
+Agent: Super Z (main)
+Task: Build Veto — deterministic policy gate for AI agents on Sui (per user's PRD)
+
+Work Log:
+- Initialized Next.js 16 + TypeScript + Tailwind + shadcn/ui scaffold via fullstack-dev skill
+- Installed @mysten/sui v2.19.0
+- Updated Prisma schema (Rule + AgentRequest models, SQLite)
+- Built lib/policy-engine.ts — pure TS, no LLM calls, 4 rule types (MAX_AMOUNT_PER_TX, DAILY_SPEND_CAP, ALLOWED_RECIPIENT, DENYLIST_ADDRESS)
+- Built lib/sui.ts — SuiJsonRpcClient + Ed25519Keypair + executeTransfer + balance helpers
+- Built lib/llm.ts — z-ai-web-dev-sdk intent parser with strict zod validation, markdown fence stripping, JSON extraction
+- Built lib/aliases.ts — named address book (self, alice, treasury)
+- Built 7 API routes: /api/agent/message (the core pipeline), /api/requests, /api/rules (GET/POST), /api/rules/[id] (PATCH/DELETE), /api/wallet, /api/aliases, /api/seed
+- Built single-page dashboard with 3 tabs: Dashboard (wallet card + chat input + activity feed), Rule book (live CRUD), Architecture (ASCII diagram + stack)
+- Auto-seeds 3 default rules on first load (per-tx cap 5 SUI, daily cap 20 SUI, denylist)
+- Wrote comprehensive README.md with deployment guide
+- Generated Ed25519 keypair, attempted faucet funding (rate-limited from sandbox IP — judge will need to fund from a clean IP for the EXECUTED flow)
+
+Stage Summary:
+- Live URL: https://preview-<bot-id>.space-z.ai/ (dev server running on port 3000)
+- Browser-verified all three flows:
+  1. BLOCKED — Per-transaction cap (100 SUI > 5 SUI): policy engine fires, no chain call ✓
+  2. BLOCKED — Known-bad address blocklist (denylist hit): no chain call ✓
+  3. FAILED — Insufficient balance (policy APPROVED, Sui returns balance error): proves full pipeline up to Sui call ✓
+- Lint: clean
+- All API routes return 200
+- Activity feed shows live updates every 4 seconds via polling
+- Dashboard screenshot saved to /home/z/my-project/download/veto_dashboard.png

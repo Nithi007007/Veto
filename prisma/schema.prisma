@@ -1,0 +1,36 @@
+// Veto — Prisma schema
+// Deterministic policy gate for AI agents that hold and move money on Sui.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite doesn't support native enums, so we use string with a TS-side union.
+
+model Rule {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // "MAX_AMOUNT_PER_TX" | "DAILY_SPEND_CAP" | "ALLOWED_RECIPIENT" | "DENYLIST_ADDRESS"
+  config    String   // JSON-encoded config (sqlite has no Json type)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AgentRequest {
+  id           String   @id @default(cuid())
+  rawMessage   String
+  parsedIntent String?  // JSON-encoded
+  amountSui    Float?
+  recipient    String?
+  status       String   @default("PENDING") // PENDING | APPROVED | BLOCKED | EXECUTED | FAILED
+  failedRule   String?
+  failReason   String?
+  txDigest     String?
+  createdAt    DateTime @default(now())
+}
