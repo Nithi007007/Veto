@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://ethglobal.com/events/cannes/prizes",
+    "name": "ETHGlobal Cannes Finalists",
+    "snippet": "For inspiration, consider naming AI agents, storing interesting data in text records (like verifiable credentials or zk proofs), or auto-rotating addresses on ...",
+    "host_name": "ethglobal.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://zkmopro.org/blog/ethglobal-cannes-2025",
+    "name": "Announcing the ETHGlobal Cannes 2025 Mopro Track Winners",
+    "snippet": "The team created a complete solution for tamper-proof media capsules, combining Mopro-generated proofs with AI-powered image summaries, ...",
+    "host_name": "zkmopro.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethglobal.com/events/cannes/prizes/walrus",
+    "name": "Walrus - ETHGlobal Cannes",
+    "snippet": "Walrus is a chain-agnostic decentralized storage network, and therefore presents a lot of opportunities for useful developer tooling. For example, SDKs, caching ...",
+    "host_name": "ethglobal.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=cJO3SWJOFw8",
+    "name": "Closing Ceremony & Finalist Demos | ETHGlobal Cannes 2025",
+    "snippet": "Join Kartik Talwar, Co-Founder of ETHGlobal, for the Closing Ceremony of ETHGlobal Cannes 2025, where all prizes are announced and finalists ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethglobal.com/events/cannes2026",
+    "name": "ETHGlobal Cannes 2026",
+    "snippet": "ETHGlobal hackathons enable you to experiment with cutting edge web3 technologies and develop an idea you're passionate about. This is your opportunity to learn ...",
+    "host_name": "ethglobal.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.rootdata.com/news/309068",
+    "name": "ETHGlobal Cannes Hackathon announces 10 finalist  - RootData",
+    "snippet": "ETHGlobal Cannes Hackathon announces 10 finalist projects, covering areas such as AI and DeFi · BeamPay implements multi-chain ERC20 payments ...",
+    "host_name": "www.rootdata.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

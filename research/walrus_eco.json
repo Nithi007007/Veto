@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.blocksandfiles.com/ai-ml/2026/03/31/walrus-pitches-memwal-as-decentralized-storage-for-ai-agent-memory/5213479",
+    "name": "Walrus pitches MemWal as decentralized storage for AI agent memory",
+    "snippet": "The idea is that MemWal stores the context of an agent's use between sessions, and thus provides a long-term agent memory. Under the hood MemWal ...",
+    "host_name": "www.blocksandfiles.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://x.com/FourPillarsFP/status/2037093124590493877",
+    "name": "This article examines Walrus MemWal's architecture for managing AI",
+    "snippet": "MemWal, a project emerging from the Walrus ecosystem, sets out to solve this problem on top of decentralized storage. It is currently available ...",
+    "host_name": "x.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cryptorank.io/news/feed/daf7d-memwal-ai-memory-walrus-sui",
+    "name": "MemWal AI Memory Layer: Walrus Protocol's Revolutionary",
+    "snippet": "Walrus announced MemWal on Sui (Mar 15, 2025): a decentralized AI memory layer that provides hierarchical short‑term/long‑term storage, ...",
+    "host_name": "cryptorank.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tatum.io/blog/walrus-memory",
+    "name": "Walrus Memory: Persistent Context for AI Agent - Tatum.io",
+    "snippet": "Walrus Memory, or MemWal, is a specialized layer built on this protocol to solve the persistence problem. It acts as a portable memory layer for ...",
+    "host_name": "tatum.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blockeden.xyz/blog/2026/04/18/walrus-protocol-ai-agent-memory-layer-sui-decentralized-storage",
+    "name": "Walrus Becomes the Brain: How Sui's Storage Protocol Turned Into",
+    "snippet": "Walrus Protocol's MemWal SDK, launched March 25, 2026, turns Sui's 450TB decentralized storage network into a persistent memory layer for ...",
+    "host_name": "blockeden.xyz",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://walruscan.com/newshub",
+    "name": "News - Walrus Explorer - Walruscan",
+    "snippet": "Walrus Introduces MemWal for AI Agents image. Ecosystem. Official. 26.03.2026 ... elizaOS Integrates Walrus as Default Memory Layer for Decentralized AI Agents ...",
+    "host_name": "walruscan.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://walrus.xyz",
+    "name": "Walrus: Verifiable Data for Developers | Data Matters",
+    "snippet": "Walrus is the Verifiable Data Platform for AI and onchain finance, powering Walrus Memory, the portable memory layer for AI agents.",
+    "host_name": "walrus.xyz",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.wal.app/walrus-memory/getting-started/what-is-walrus-memory",
+    "name": "What is Walrus Memory?",
+    "snippet": "Decentralized Storage. Encrypted blobs stored on Walrus, no single point of failure, no central operator holding your data. Programmable Permissions.",
+    "host_name": "docs.wal.app",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

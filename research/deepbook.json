@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.deepbook.tech",
+    "name": "DeepBook on Sui | Fully On-Chain Order Book for DeFi",
+    "snippet": "DeepBook is a fully on-chain order book on Sui powering spot, margin, and prediction markets with shared liquidity and fast, low-latency settlement.",
+    "host_name": "www.deepbook.tech",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://x.com/DeepBookonSui",
+    "name": "DeepBook Protocol on Sui (@DeepBookonSui) / Posts / X - Twitter",
+    "snippet": "The trades you've wanted to make, but couldn't. Pick any strike. Trade ranges, not just up or down. Use leverage to express conviction.",
+    "host_name": "x.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.sui.io/onchain-finance/deepbook-predict",
+    "name": "DeepBook Predict - Sui Documentation",
+    "snippet": "DeepBook Predict is an expiry-based prediction market protocol on Sui. It lets applications build markets where users can mint and redeem binary positions or ...",
+    "host_name": "docs.sui.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinmarketcap.com/cmc-ai/deepbook-protocol/latest-updates",
+    "name": "Latest DeepBook Protocol (DEEP) News Update - CoinMarketCap",
+    "snippet": "DeepBook's roadmap focuses on evolving from core trading infrastructure to a comprehensive DeFi suite with prediction markets and leveraged ...",
+    "host_name": "coinmarketcap.com",
+    "rank": 3,
+    "date": "Jun 18, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=UnGknVbIVG0",
+    "name": "Where Sui Finance Starts w/ Aslan Tashtanov - DeepBook - YouTube",
+    "snippet": "... DeepBook is evolving from Sui's native liquidity layer into a broader on-chain trading stack ... DeepBook's spot, margin, and new prediction ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/sui/comments/1i5miw6/deepbook_protocol_what_is_it_and_what_does_it_do",
+    "name": "Deepbook protocol: what is it and what does it do?! : r/sui - Reddit",
+    "snippet": "Deepbook is like the backend of SUI dex trading - a central limit order book that any dex built on sui will be tapping into to facilitate trades.",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinpedia.org/price-prediction/deepbook-protocol-deep-price-prediction",
+    "name": "DeepBook Protocol Price Prediction 2026, 2027 - 2030 - Coinpedia",
+    "snippet": "If more DEXs, lending markets, and derivatives platforms route liquidity through DeepBook, DEEP could target a yearly high near $0.07–$0.105.",
+    "host_name": "coinpedia.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8m3Q9My-qDo",
+    "name": "Sui Overflow 2026 Workshop: How to Trade on DeepBook Predict",
+    "snippet": "In this workshop, you'll learn how to go from zero to placing your first trade. ​What DeepBook Predict is - trading directional bets and ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

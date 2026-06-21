@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://blockworks.com/news/solana-data-startup-wins-hackathon",
+    "name": "Solana data storage project wins Colosseum hackathon - Blockworks",
+    "snippet": "TAPEDRIVE claims to have the ability to read or write data (that is, access or add it to the chain) 1,400x cheaper than Solana's status quo. The ...",
+    "host_name": "blockworks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/posts/the-blockworks-group_solana-data-storage-project-wins-colosseum-activity-7346636544092348417-4kMJ",
+    "name": "TAPEDRIVE wins hackathon with cheaper Solana storage - LinkedIn",
+    "snippet": "A Solana data storage project has won the grand prize in the latest Colosseum hackathon. TAPEDRIVE says it can make Solana data storage ...",
+    "host_name": "www.linkedin.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://x.com/Blockworks_/status/1940870919431639159",
+    "name": "TAPEDRIVE says it can make Solana data storage 1400x cheaper",
+    "snippet": "Solana data storage project TAPEDRIVE says it can make data storage 1,400x cheaper. Here's how: Solana data storage project wins Colosseum ...",
+    "host_name": "x.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://solana.com/uk/podcasts/lightspeed/episodes/blockworks-acquires-messari-2026-06-12",
+    "name": "Blockworks Acquires Messari | Lightspeed | Solana Media",
+    "snippet": "In this special episode, Blockworks announces its acquisition of Messari and unpacks what it means for crypto's next phase.",
+    "host_name": "solana.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arena.colosseum.org/projects/explore/tapedrive?ref=blog.colosseum.com",
+    "name": "TapeDrive - Colosseum",
+    "snippet": "TAPEDRIVE makes it easy to read and write data on Solana. It's over 1,400x cheaper than using an account. It works by compressing your data into tiny ...",
+    "host_name": "arena.colosseum.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Y8YFjtxqKpw",
+    "name": "The Solana Hackathon Playbook Nobody Shares - Insider Info",
+    "snippet": "How to win the Colosseum Frontier hackathon using the exact playbook judges want to see. Watch The In Depth Video Here ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://blockworks.com/news/reflect-stablecoin-infra-raise",
+    "name": "Reflect raises $3.75M to build yield-bearing stablecoin infra on Solana",
+    "snippet": "Reflect won Grand Champion in Colosseum's 2024 Solana Radar hackathon. ... Reflect protocol tokenizes onchain DeFi strategies — delta-neutral ...",
+    "host_name": "blockworks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://solana.com/news/solana-radar-winners",
+    "name": "Announcing the Winners of the Solana Radar Hackathon",
+    "snippet": "Reflect, a decentralized currency exchange based on hedge-backed stablecoins, received the Grand Prize of $50,000 USDC, along with passes to ...\nReflect aims to provide a stable, decentralized alternative to USDC and USDT, allowing users to earn US dollar yield in various currencies. We utilize LSTs as collateral for delta neutral positions, offering industry-leading interest rates with principal protection.",
+    "host_name": "solana.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@shailamie/building-ai-assisted-delta-neutral-strategies-on-solana-perpetuals-1b5c1f289397",
+    "name": "Building AI-Assisted Delta-Neutral Strategies on Solana Perpetuals",
+    "snippet": "This comprehensive guide demonstrates how to architect production-grade AI-assisted delta-neutral systems on Solana using perpetual protocols ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://solanafloor.com/news/which-radar-hackathon-winner-will-be-solanas-next-killer-app",
+    "name": "Which Radar Hackathon Winner Will Be Solana's Next Killer App?",
+    "snippet": "Reflect, a DeFi protocol, was crowned the event's Grand Champion and took home the $50,000 prize to support its continued development.",
+    "host_name": "solanafloor.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DY5inndPtk2",
+    "name": "We are optimizing for Solana to win. That's the only thing  - Instagram",
+    "snippet": "We'll have more traders, more market makers, more users, better prices. All this brings in more priority fees and more revenue to validators and ...",
+    "host_name": "www.instagram.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blockworks.com/analytics/solana",
+    "name": "Solana: Overview - Analytics Dashboard - Blockworks",
+    "snippet": "Solana is a high-performance blockchain that prioritizes speed, scalability, and low-cost transactions. The network beats out competitors like Ethereum and ...",
+    "host_name": "blockworks.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

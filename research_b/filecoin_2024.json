@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://filecoin.io/blog/posts/the-filecoin-community-s-largest-hackathon-yet",
+    "name": "Filecoin and FVM's Most Successful Hackathon Yet!",
+    "snippet": "The Filecoin community recently completed its largest hackathon to date specifically for developers to kick off building with FEVM!",
+    "host_name": "filecoin.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/filecoin-project/community/discussions/585",
+    "name": "FVM Hackathon Cheat Sheet · filecoin-project community - GitHub",
+    "snippet": "How can I use FVM to store data to Filecoin? / How can I store data with FVM? The intent of FEVM/FVM is to compute over state data (the metadata of your stored ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fvmdataverse.devpost.com",
+    "name": "FVM Dataverse Hack: Build the new data economy with the Filecoin",
+    "snippet": "Build the new data economy with the Filecoin Virtual Machine. This hackathon has ended. Find more hackathons View the winners. Who can participate. Above ...",
+    "host_name": "fvmdataverse.devpost.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethglobal.com/events/hackfs2024/prizes/filecoin",
+    "name": "Filecoin - ETHGlobal",
+    "snippet": "Filecoin is the L1 blockchain and storage network uniquely poised to power the open data economy. The mission of Filecoin is to create a decentralized, ...",
+    "host_name": "ethglobal.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dorahacks.io/hackathon/filecoin-data-economy/detail",
+    "name": "Filecoin | InterPlanetary Consensus (IPC): Data Economy Hackathon",
+    "snippet": "Winners will be showcased to our accelerator programs with leading ... Contact the FVM hackathons team with questions, if any. DoraHacks. FOLLOW US ...",
+    "host_name": "dorahacks.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_3balUoAJHE",
+    "name": "Open Data Hack powered by Filecoin: FVM Introduction - YouTube",
+    "snippet": "... hackathon here: https://www.encode.club/open-data-hack What's next ... storage-helpers-workshop-with-nftstorage-tickets-706094667157 ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.filecoin.io/blog/the-fvm-imaginarium-developer-tooling-hackathons-and-other-opportunities-for-builders",
+    "name": "The FVM Imaginarium: Developer Tooling, Hackathons and other",
+    "snippet": "The Filecoin Ethereum Virtual Machine (FEVM) is a groundbreaking platform that allows developers to write logic directly on top of the metadata ...",
+    "host_name": "www.filecoin.io",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fil.org/blog/filecoin-foundation-2024-annual-report",
+    "name": "Filecoin Foundation 2024 Annual Report",
+    "snippet": "In this report, you'll read about the ways that Filecoin Foundation supported the Filecoin community in 2024 and learn about FF's strategic priorities in 2025.",
+    "host_name": "fil.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://x.com/Filecoin/status/1869904897962856869",
+    "name": "2024 was a breakthrough year for Filecoin",
+    "snippet": "2024 was a breakthrough year for Filecoin: FVM supercharged on-chain activity, ZK storage secured entire @Solana ledger, @blockfrost_io + ...",
+    "host_name": "x.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://spacewarp.fvm.dev",
+    "name": "Filecoin FVM Space Warp",
+    "snippet": "Results to be announced. $150k+ in prizes. ETHGlobal FVM Hackathon. Register for our biggest hackathon yet for a chance to win a prize from a $150k+ prize pool.",
+    "host_name": "spacewarp.fvm.dev",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.filecoin.io/blog/announcing-the-hack-fevm-finalists",
+    "name": "Announcing the Hack FEVM Finalists - Filecoin",
+    "snippet": "The first-ever Hack FEVM welcomed over 400 hackers to build and showcase 117 projects with over $50,000 awarded through various prizes!",
+    "host_name": "www.filecoin.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=SRQza6IxOjo",
+    "name": "Hacker Team Wins $50,000 For Hacking A DoD Satellite At DefCon",
+    "snippet": "DefCon is one of the world's most famous hacker conventions, it's been taking place in Las Vegas since the early 1990's and I've been to a ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.businessinsider.com/hackers-us-air-force-satellite-space-win-50000-prize-security-2023-8",
+    "name": "Hackers Find 3 Weakspots in US Air Force Satellite, Win $50K Prize",
+    "snippet": "Hackers managed to break into a US Air Force satellite in orbit, and took home prizes of up to $50,000 for exposing the vulnerabilities.",
+    "host_name": "www.businessinsider.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://theconversation.com/a-chinese-hacking-competition-may-have-given-beijing-new-ways-to-spy-on-the-uyghurs-161226",
+    "name": "A Chinese hacking competition may have given Beijing new ways to",
+    "snippet": "China's principal hacking competition, the Tianfu Cup, where a professional hacker won a prize for his work in uncovering it.",
+    "host_name": "theconversation.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nbcnews.com/tech/security/china-used-three-private-companies-hack-global-telecoms-us-says-rcna227543",
+    "name": "China used three private companies to hack global telecoms, U.S.",
+    "snippet": "Three private Chinese companies helped China carry out one of the boldest hacking operations to date, including snooping on text messages ...",
+    "host_name": "www.nbcnews.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

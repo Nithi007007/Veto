@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://filecoin.io/blog/posts/the-filecoin-community-s-largest-hackathon-yet",
+    "name": "Filecoin and FVM's Most Successful Hackathon Yet!",
+    "snippet": "The Filecoin community recently completed its largest hackathon to date specifically for developers to kick off building with FEVM!",
+    "host_name": "filecoin.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/filecoin-project/community/discussions/585",
+    "name": "FVM Hackathon Cheat Sheet · filecoin-project community - GitHub",
+    "snippet": "DataDAO Starter Kit: uses Client Contract for storage and Open Zepplin's Governor contract to quickly spin up a dataDAO. ... How can I use FVM to store data to ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_3balUoAJHE",
+    "name": "Open Data Hack powered by Filecoin: FVM Introduction - YouTube",
+    "snippet": "... hackathon here: https://www.encode.club/open-data-hack What's ... storage network poised to power the open data economy. The Filecoin ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://filecoin.io/blog/posts/filecoin-news-86",
+    "name": "Filecoin News 86",
+    "snippet": "Join us at the upcoming FIL Dev Summit, set for July 9-11, 2024, in the heart of Brussels at the Radisson, Grand Place.",
+    "host_name": "filecoin.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dorahacks.io/hackathon/filecoin-data-economy/results",
+    "name": "Filecoin | InterPlanetary Consensus (IPC): Data Economy Hackathon",
+    "snippet": "The project is aiming for building a data base to protect storage providers storing NSFW(not safe for work) content. With generative AI ...",
+    "host_name": "dorahacks.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethglobal.com/events/hackfs2024/prizes/filecoin",
+    "name": "Filecoin - ETHGlobal",
+    "snippet": "Filecoin is the L1 blockchain and storage network uniquely poised to power the open data economy. The mission of Filecoin is to create a decentralized, ...",
+    "host_name": "ethglobal.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://filecoin.io/blog/posts/the-filecoin-community-s-largest-hackathon-yet",
+    "name": "Filecoin and FVM's Most Successful Hackathon Yet!",
+    "snippet": "The Filecoin community recently completed its largest hackathon to date specifically for developers to kick off building with FEVM!",
+    "host_name": "filecoin.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ethglobal.com/events/hackfs2024/prizes/filecoin",
+    "name": "Filecoin - ETHGlobal",
+    "snippet": "FVM ⸺ $24,000 🥇. There are three Grand Prizes available honoring the top three projects from the hackathon overall. We will award up to $6,000 to honorable ...",
+    "host_name": "ethglobal.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dorahacks.io/hackathon/filecoin-data-economy/ideaism",
+    "name": "Filecoin | InterPlanetary Consensus (IPC): Data Economy Hackathon",
+    "snippet": "A starter kit built on the FVM that makes it easy for anyone to create a DataDAO and start curating, storing, and monetizing valuable datasets. The starter kit ...",
+    "host_name": "dorahacks.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.filecoin.io/blog/announcing-the-hack-fevm-finalists",
+    "name": "Announcing the Hack FEVM Finalists - Filecoin",
+    "snippet": "The first-ever Hack FEVM welcomed over 400 hackers to build and showcase 117 projects with over $50,000 awarded through various prizes!",
+    "host_name": "www.filecoin.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://spacewarp.fvm.dev",
+    "name": "Filecoin FVM Space Warp",
+    "snippet": "The program includes grants, a hackathon, a builders' leaderboard, and more totalling over $400k in FIL tokens. a $75k prize pool over the course of 12+ weeks. ...",
+    "host_name": "spacewarp.fvm.dev",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fil.org/orbit",
+    "name": "Filecoin Orbit Community Program – Events, Hackathons, Initiatives",
+    "snippet": "This community-led initiative invites you to join us in spreading the word about groundbreaking technologies like Filecoin and Interplanetary FileSystem (IPFS).",
+    "host_name": "fil.org",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.near.org/blog/coinbase-onchain-ai-hackathon",
+    "name": "Transforming Technology at the Coinbase Onchain AI Hackathon",
+    "snippet": "The hackathon, held from February 1–2 in San Francisco, was designed to push the boundaries of AI Agent innovation.",
+    "host_name": "www.near.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=tspDNODQ4uY",
+    "name": "Chromion: A Chainlink Hackathon | Build Your AI Agent - YouTube",
+    "snippet": "We will use the Eliza framework to build an AI Agent specifically designed to interact with users on Twitter. This agent will listen for ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@gwrx2005/integrating-ai-agents-into-crypto-wallets-for-defi-frameworks-strategies-and-challenges-81e0cdf13bf3",
+    "name": "Integrating AI Agents into Crypto Wallets for DeFi - Medium",
+    "snippet": "This paper explores how to build and integrate crypto wallets for DeFi applications with AI agents, targeting an audience of researchers, developers, and ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://soneium.hackerearth.com",
+    "name": "Agent Hackathon on Soneium: Online Hackathon | HackerEarth",
+    "snippet": "Prompt: Build an AI agent that analyzes communities for token airdrops, simulates impact, and optionally deploys the contract. Use Sequence for: Airdrop flows ...",
+    "host_name": "soneium.hackerearth.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dorahacks.io/hackathon/bnbhack-twt-cmc",
+    "name": "BNB Hack: AI Trading Agent Edition ️ CoinMarketCap × Trust",
+    "snippet": "BNB Hack: AI Trading Agent Edition ⚡️ CoinMarketCap × Trust Wallet** Ship a crypto-native AI trading agent on BNB Chain in 3 weeks.",
+    "host_name": "dorahacks.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://lablab.ai/ai-hackathons/internet-of-agents",
+    "name": "The INTERNET OF AGENTS HACKATHON @SOLANA SKYLINE",
+    "snippet": "Explore the recap of The INTERNET OF AGENTS HACKATHON @SOLANA SKYLINE. Browse winning projects, submissions, and results from this free AI hackathon on lab.",
+    "host_name": "lablab.ai",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/posts/the-open-network-foundation_ton-ai-agent-hackathon-is-officially-closed-activity-7442725413279170560-6FjD",
+    "name": "TON AI Agent Hackathon Results Announced - LinkedIn",
+    "snippet": "TON AI Agent Hackathon is officially closed. Two weeks ago, we challenged builders to create AI agents on Telegram and TON.",
+    "host_name": "www.linkedin.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://rdi.berkeley.edu/llm-agents-hackathon",
+    "name": "LLM Agents Hackathon - Berkeley RDI",
+    "snippet": "This LLM Agents Hackathon, hosted by Berkeley RDI and in conjunction with the LLM Agents MOOC, aims to bring together students, researchers, and practitioners.",
+    "host_name": "rdi.berkeley.edu",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

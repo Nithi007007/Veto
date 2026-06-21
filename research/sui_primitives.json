@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://docs.sui.io/develop/transactions/ptbs/building-ptb",
+    "name": "Building Transactions - Sui Documentation",
+    "snippet": "This guide explores creating a programmable transaction block (PTB) on Sui using the TypeScript SDK and the Sui CLI. This example constructs a PTBProgrammable ...",
+    "host_name": "docs.sui.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/sui-foundation/awesome-sui",
+    "name": "GitHub - sui-foundation/awesome-sui: A curated list of Move code",
+    "snippet": "A curated list of awesome developer tools and infrastructure projects within the Sui ecosystem. Sui is the first blockchain built for internet scale.",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/the-sui-stack/code-in-move-4-sui-move-basics-76c21cc0df1c",
+    "name": "Code in Move [4] — Sui Move Basics | by Thouny - Medium",
+    "snippet": "This talented team developed exciting building primitives such as PTBs, sponsored transactions, zkLogin, zkSend, dynamic fields, closed loop ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.iota.org/developer/iota-101/transactions/ptb/building-programmable-transaction-blocks-ts-sdk",
+    "name": "Build Programmable Transaction Blocks with TypeScript SDK",
+    "snippet": "This guide illustrates how to build a programmable transaction block (PTB) on IOTA using the TypeScript SDK. This example starts by building a PTB to send IOTA ...",
+    "host_name": "docs.iota.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.fordefi.com/developers/transaction-types/sui-programmable-transaction-block",
+    "name": "Sui Programmable Transaction Block - Fordefi!",
+    "snippet": "Building the transaction BCS data can be done using any of the available Sui SDKs. One example is the @mysten/sui.js package. The following example shows ...",
+    "host_name": "docs.fordefi.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://members.delphidigital.io/reports/sui-network-demystifying-the-monolithic-contender",
+    "name": "Sui Network: Demystifying the Monolithic Contender - Delphi Digital",
+    "snippet": "PTB, or Programmable Transaction Blocks on Sui, is a developer primitive that can execute up to 1024 transactions or unique operations in a ...",
+    "host_name": "members.delphidigital.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://node.capital/blog/move-fast-and-build-things-the-sui-suite-of-innovations",
+    "name": "Move Fast and Build Things: The Sui Suite of Innovations",
+    "snippet": "Programmable Transaction Blocks lower development barriers, while sponsored transactions and zkLogin remove user friction. DeepBook offers ...",
+    "host_name": "node.capital",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.sui.io/t/rfc-sponsored-transaction/589",
+    "name": "[RFC] Sponsored Transaction - General - Sui Developer Forum",
+    "snippet": "For example, gaming studios convert their web2 gamers to web3 users by sponsoring early user transactions. incentivizing on-chain activity ...",
+    "host_name": "forums.sui.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]
