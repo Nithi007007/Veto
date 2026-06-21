@@ -71,8 +71,10 @@ export async function parseIntent(message: string): Promise<LlmIntentResult> {
       messages: [{ role: "user", content: message }],
     });
 
-    // Extract text from response
-    const textBlock = response.content.find((b: any) => b.type === "text");
+    // Extract text from response (type-narrow to TextBlock)
+    const textBlock = response.content.find(
+      (b): b is Anthropic.TextBlock => b.type === "text"
+    );
     raw = textBlock?.text ?? "";
   } catch (e: any) {
     return {

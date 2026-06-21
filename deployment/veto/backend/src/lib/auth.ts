@@ -74,7 +74,7 @@ export function clearOwnerSessionCookie(c: Context) {
  */
 export function isOwnerAuthorized(c: Context): boolean {
   // 1. Cookie check
-  const cookieValue = getCookie(c, OWNER_COOKIE_NAME);
+  const cookieValue = getCookie(c, OWNER_COOKIE_NAME) ?? null;
   if (verifySessionCookie(cookieValue)) return true;
 
   // 2. Token check (for API clients / curl)

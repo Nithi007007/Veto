@@ -16,7 +16,8 @@ let _keypair: Ed25519Keypair | null = null;
 export function getSuiClient(): SuiJsonRpcClient {
   if (!_client) {
     const rpcUrl = process.env.RPC_URL || getJsonRpcFullnodeUrl(NETWORK as any);
-    _client = new SuiJsonRpcClient({ url: rpcUrl });
+    // SDK v2 requires either { network } or { url } — use url form
+    _client = new SuiJsonRpcClient({ url: rpcUrl } as any);
   }
   return _client;
 }
@@ -71,14 +72,18 @@ export async function executeTransfer(recipient: string, amountSui: number): Pro
       client: client as any,
     });
 
-    const effects: any = (result as any).effects;
+    // SDK v2 returns the result in a slightly different shape — cast to any
+    // to access digest + effects without fighting the type system.
+    const r = result as any;
+    const effects: any = r.effects;
     const status = effects?.status?.status;
+    const digest: string = r.digest ?? "";
 
     if (status === "success") {
-      return { digest: result.digest, status: "success" };
+      return { digest, status: "success" };
     }
     return {
-      digest: result.digest,
+      digest,
       status: "failure",
       errorMessage: effects?.status?.error || "Transaction executed but failed",
     };
