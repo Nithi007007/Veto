@@ -12,7 +12,7 @@ AI agents are starting to hold real wallets. Most agent frameworks let the model
 
 ```bash
 # 1. Clone this repo
-git clone https://github.com/yourname/veto.git
+git clone https://github.com/YOUR-USERNAME/veto.git
 cd veto
 
 # 2. Run setup (installs deps, creates .env files, pushes DB schema)
@@ -29,6 +29,10 @@ Or run everything with Docker:
 ```bash
 docker-compose up -d
 ```
+
+> **See [QUICK_START.md](QUICK_START.md) for the 5-minute local setup guide.**
+> **See [DEPLOYMENT.md](DEPLOYMENT.md) for the full production deployment guide.**
+> **See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for the pre-submission checklist.**
 
 ## Project structure
 

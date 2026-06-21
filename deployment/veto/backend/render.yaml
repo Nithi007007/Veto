@@ -1,6 +1,12 @@
 # Render deployment config for Veto backend
 # Docs: https://render.com/docs/blueprint-spec
-# Create a new Web Service from this file on Render.
+#
+# How to use:
+#   1. Push this repo to GitHub
+#   2. Go to render.com → New → Blueprint
+#   3. Select your GitHub repo
+#   4. Render will read this file and create the service
+#   5. Set all "sync: false" env vars manually in the Render dashboard
 
 services:
   - type: web
@@ -10,28 +16,49 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     autoDeploy: true
+    # Render runs: docker build → docker run
+    # The Dockerfile handles: npm install → prisma generate → tsc → prisma migrate deploy → node dist/index.js
     envVars:
+      # ─── Database (Neon Postgres) ───
       - key: DATABASE_URL
-        sync: false  # Set manually: Neon Postgres connection string
+        sync: false  # Set manually: postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require
+
+      # ─── Redis (Upstash) ───
       - key: UPSTASH_REDIS_REST_URL
-        sync: false  # Set manually: Upstash Redis REST URL
+        sync: false  # Set manually: https://xxx-xxx.upstash.io
       - key: UPSTASH_REDIS_REST_TOKEN
-        sync: false  # Set manually: Upstash Redis REST token
+        sync: false  # Set manually: your Upstash REST token
+
+      # ─── Sui ───
       - key: RPC_URL
         value: https://fullnode.testnet.sui.io
       - key: PRIVATE_KEY
-        sync: false  # Set manually: agent's Ed25519 private key
+        sync: false  # Set manually: suiprivkey1q... (agent's Ed25519 private key)
       - key: PACKAGE_ID
+        sync: false  # Set after deploying Move contracts to Sui testnet
+      - key: VAULT_OBJECT_ID
+        sync: false  # Set after deploying Move contracts
+      - key: OWNER_CAP_ID
         sync: false  # Set after deploying Move contracts
       - key: NETWORK
         value: testnet
-      - key: PORT
-        value: 10000
+
+      # ─── Auth ───
       - key: OWNER_PASSWORD
-        sync: false  # Set manually: strong password
+        sync: false  # Set manually: a strong password
       - key: OWNER_TOKEN
-        sync: false  # Set manually: bearer token for API clients
+        sync: false  # Set manually: a bearer token for API clients
+      - key: OWNER_COOKIE_SECRET
+        sync: false  # Optional: HMAC secret for cookies (defaults to OWNER_PASSWORD)
+
+      # ─── LLM ───
       - key: ANTHROPIC_API_KEY
         sync: false  # Set manually: sk-ant-xxx...
+
+      # ─── Server ───
+      - key: PORT
+        value: 10000
       - key: CORS_ORIGINS
-        sync: false  # Set manually: https://your-app.vercel.app
+        sync: false  # Set manually: https://your-app.vercel.app (your Vercel URL)
+      - key: NODE_ENV
+        value: production
