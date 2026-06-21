@@ -420,3 +420,39 @@ Stage Summary:
 - All API routes return 200
 - Activity feed shows live updates every 4 seconds via polling
 - Dashboard screenshot saved to /home/z/my-project/download/veto_dashboard.png
+
+---
+Task ID: VETO-V2
+Agent: Super Z (main)
+Task: Implement v2 changes from user's updated PRD + answer the 20 judge questions
+
+Work Log:
+- Web research: confirmed Coinbase Agentic Wallets (Feb 2026), Truth Terminal, ElizaOS, Permit.io, Arcjet, LangGraph HITL, Move vs Solidity safety, Sui shared objects
+- Wrote decision memo mapping each of the 20 questions to a specific implementation
+- Wrote Move source for veto::vault module (move/veto/sources/vault.move) — atomic spend(), configurable caps, commit_rules(), shared object
+- Built off-chain vault simulator (src/lib/vault.ts) that mirrors Move semantics exactly
+- Added RuleBookCommit Prisma model + confirmedAt field on AgentRequest
+- Built Owner/Agent auth: src/lib/auth.ts requireOwner() middleware on /api/rules* routes
+- Rewrote /api/agent/message to return AWAITING_CONFIRMATION (step 1 of two-step flow)
+- Built new /api/agent/confirm endpoint (step 2: vault pre-flight + policy + execute)
+- Updated /api/rules to (a) require owner token, (b) trigger vault re-commit on every change, (c) return current vault state + commit
+- Updated /api/rules/[id] (PATCH/DELETE) to require owner token + re-commit
+- Updated /api/seed to create initial vault commit
+- Rewrote page.tsx with: vault card on dashboard, confirmation dialog with diff warnings, owner-token-authenticated rules editing, vault commit card on rules tab, 20-question Q&A on architecture tab
+- Updated README with v2 architecture, evidence section, the 3 defense layers
+- Browser-verified all 4 flows:
+  1. on-chain vault block (100 SUI > 5 SUI cap) → "on-chain vault: EAmountExceedsPerTx" ✓
+  2. off-chain rule block (denylist hit) → "blocked by: Known-bad address blocklist" ✓
+  3. user rejection in confirmation dialog → "rejected by: user rejected" ✓
+  4. owner-token enforcement: curl without token returns 401, with token succeeds + bumps vault version ✓
+- Lint: clean
+
+Stage Summary:
+- Live URL: https://preview-<bot-id>.space-z.ai/
+- v2 dashboard shows: wallet card + on-chain vault card (with SIMULATED badge) + chat input + activity feed
+- Rules tab shows: owner-role banner + vault commit card (version, SHA-256 hash, caps, spent today) + off-chain rules list
+- Architecture tab shows: v2 ASCII diagram + stack list + ALL 20 Q&A visible to judges
+- Vault commit at v3 (every rule edit bumps version + recomputes hash — tamper-evidence proven)
+- Owner/Agent boundary enforced at API layer (401 without owner token, verified via curl)
+- Two-step confirmation flow catches LLM hallucinations before any chain call
+- Screenshot: /home/z/my-project/download/veto_v2_dashboard.png

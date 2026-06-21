@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://docs.cdp.coinbase.com/agentic-wallet/cli/welcome",
+    "name": "Agentic Wallet CLI - Coinbase Developer Documentation",
+    "snippet": "Give your AI agent a wallet. Pay for APIs, ly, with built-in spending limits. Spending guardrails: Enforce limits before any transaction. Block high-risk ...",
+    "host_name": "docs.cdp.coinbase.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.coinbase.com/developer-platform/discover/launches/agentic-wallets",
+    "name": "Introducing Agentic Wallets: Give Your Agents the Power of Autonomy",
+    "snippet": "Agentic Wallets come with programmable spending limits: Session caps: Set maximum amounts agents can spend per session. Transaction limits ...",
+    "host_name": "www.coinbase.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://eco.com/support/en/articles/14845485-coinbase-agentic-wallets-explained",
+    "name": "Coinbase Agentic Wallets Explained | Support - Eco",
+    "snippet": "Coinbase Agentic Wallets, launched February 11, 2026, give AI agents an MPC-secured wallet with session caps, spend limits, and native x402 ...",
+    "host_name": "eco.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.theblock.co/post/389524/coinbase-rolls-out-ai-tool-to-give-any-agent-a-wallet",
+    "name": "Coinbase rolls out AI tool to 'give any agent a wallet' | The Block",
+    "snippet": "It also features Smart Security Guardrails, like programmable spending limits, session caps, and other transaction controls.",
+    "host_name": "www.theblock.co",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cryptobriefing.com/coinbase-ai-agent-accounts-trading",
+    "name": "Coinbase launches AI agent accounts for automated trading and",
+    "snippet": "The wallets come with user-defined guardrails including spending limits and risk controls, so your AI trading bot can't exactly go rogue and ...",
+    "host_name": "cryptobriefing.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.paymentsjournal.com/coinbase-unveils-agentic-wallets-to-power-autonomous-ai-spending-and-investing",
+    "name": "Coinbase Unveils Agentic Wallets to Power Autonomous AI",
+    "snippet": "Coinbase has implemented guardrails within its agentic wallets to ensure agents stay on task, including programmable spending limits and ...",
+    "host_name": "www.paymentsjournal.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

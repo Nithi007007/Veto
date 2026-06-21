@@ -1,11 +1,13 @@
 /**
- * PATCH /api/rules/:id — toggle enabled state or update config
- * DELETE /api/rules/:id — remove a rule
+ * PATCH /api/rules/:id — toggle enabled state or update config (Owner only) → triggers vault commit
+ * DELETE /api/rules/:id — remove a rule (Owner only) → triggers vault commit
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { requireOwner } from "@/lib/auth";
+import { commitRulesToVault } from "@/lib/vault";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,9 @@ function buildConfigString(type: string, config: any): string {
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  const auth = requireOwner(req);
+  if (auth) return auth;
+
   const { id } = await params;
 
   let body: any;
@@ -70,14 +75,25 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   }
 
   const updated = await db.rule.update({ where: { id }, data: update });
-  return NextResponse.json({ rule: updated });
+
+  // Re-commit the rule set
+  const allRules = (await db.rule.findMany({ orderBy: { createdAt: "asc" } })) as any;
+  const commit = await commitRulesToVault(allRules);
+
+  return NextResponse.json({ rule: updated, commit });
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
+export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  const auth = requireOwner(req);
+  if (auth) return auth;
+
   const { id } = await params;
   try {
     await db.rule.delete({ where: { id } });
-    return NextResponse.json({ ok: true });
+    // Re-commit after deletion
+    const allRules = (await db.rule.findMany({ orderBy: { createdAt: "asc" } })) as any;
+    const commit = await commitRulesToVault(allRules);
+    return NextResponse.json({ ok: true, commit });
   } catch {
     return NextResponse.json({ error: "Rule not found" }, { status: 404 });
   }

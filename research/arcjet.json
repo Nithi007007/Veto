@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://docs.arcjet.com/ai-protection",
+    "name": "AI Runtime Protection | Arcjet Docs",
+    "snippet": "Arcjet helps protect AI applications by providing guardrails across the entire AI lifecycle, using real application context (identity, route, session, cost ...",
+    "host_name": "docs.arcjet.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.arcjet.com/introducing-arcjets-local-ai-security-model-announcing-series-a-funding",
+    "name": "Introducing Arcjet's local AI security model + announcing Series A",
+    "snippet": "Announcing Arcjet's local AI security model, an opt-in AI security layer that runs expert security analysis for every request entirely in ...",
+    "host_name": "blog.arcjet.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=TL3MGnI4hUU",
+    "name": "AI Agents Need Guardrails Before They Touch Real Accounts",
+    "snippet": "In this episode, Tom Eston explains why AI agents need boundaries, least privilege, human approval, and logging before they are connected to ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "Jun 15, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.openai.com/t/building-a-role-aware-guardrail-layer-between-llms-and-production-databases/1370566",
+    "name": "Building a role-aware guardrail layer between LLMs and production",
+    "snippet": "I ran into a problem while building a chat-first app that lets users query real production data with LLMs: Once an LLM can talk to a ...",
+    "host_name": "community.openai.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.ibm.com/think/topics/ai-guardrails",
+    "name": "What Are AI Guardrails? - IBM",
+    "snippet": "AI guardrails are the safeguards that keep artificial intelligence (AI) systems operating safely, responsibly and within defined boundaries.",
+    "host_name": "www.ibm.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.arcjet.com/get-started",
+    "name": "Get started with Arcjet",
+    "snippet": "Getting started with Arcjet. Quick start guide to protect your AI applications from abuse, apply per-user token budgets, and block automated clients.",
+    "host_name": "docs.arcjet.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

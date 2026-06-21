@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.permit.io",
+    "name": "Permit.io | Permissions for the AI Era",
+    "snippet": "Permit.io unifies policy, delegation, approvals, trust, and audit into one action-time policy fabric — for humans, services, and AI agents.",
+    "host_name": "www.permit.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/tags/ai-identity",
+    "name": "AI Identity - Permit.io",
+    "snippet": "This guide covers the real security risks, why authorization must happen at the tool-call level, and how Permit.io and the Permit MCP Gateway enforce least- ...",
+    "host_name": "www.permit.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/ai-access-control",
+    "name": "Fine-Grained Permissions for AI-Powered Applications - Permit.io",
+    "snippet": "Permit.io adds authorization rules at the server level, checking who's making a request and what action they want to perform. Developers can assign machine ...",
+    "host_name": "www.permit.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/author/gemanor",
+    "name": "Gabriel L. Manor - Permit.io Blog Authors",
+    "snippet": "Define, test, deploy, and enforce fine-grained authorization using AI, CI/CD, GitOps, and OpenAPI",
+    "host_name": "www.permit.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/blog/authorization-strategies-for-model-context-protocol-mcp",
+    "name": "Authorization Strategies for Model Context Protocol (MCP) - Permit.io",
+    "snippet": "Permit.io provides a centralized authorization platform that enforces RBAC, ABAC, and ReBAC across MCP servers, APIs, and data layers.",
+    "host_name": "www.permit.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/posts/orweis_ai-security-authorization-activity-7442499266540941312-rlSw",
+    "name": "Permit.io Launches Agentic Permissions Gateway for AI Agents",
+    "snippet": "AI agents need more than auth and tokens. They need dynamic trust, real-time permissions, and identity that reflects who they are, what they ...",
+    "host_name": "www.linkedin.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

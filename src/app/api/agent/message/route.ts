@@ -1,23 +1,28 @@
 /**
  * POST /api/agent/message
  *
- * The core pipeline. One route ties everything together:
- *   1. LLM parses the raw message into a structured intent
- *   2. zod validates the intent shape
- *   3. aliases are resolved to real addresses
- *   4. policy engine evaluates the intent against all enabled rules
- *   5. if APPROVED → execute a real signed Sui testnet transfer
- *   6. persist AgentRequest row with full audit data
- *   7. return the result
+ * Two-step flow (hallucination guard):
+ *   Step 1 (this route): parse the LLM intent → store as AWAITING_CONFIRMATION → return parsed intent
+ *   Step 2 (/api/agent/confirm): user explicitly confirms → policy engine + SUI execution
+ *
+ * Why two-step: LLMs hallucinate. User says "send ten SUI to alice" — LLM
+ * might return "send 100 SUI to bob". The two-step flow forces the user to
+ * see the parsed intent before any policy check or chain call. The
+ * confirmation screen shows:
+ *   - original message
+ *   - parsed amount + recipient (with the actual address resolved from alias)
+ *   - a diff highlighting anything that changed between message and intent
+ *
+ * This is the "human-in-the-loop" pattern, but applied specifically to
+ * catch LLM parsing errors — not as a replacement for the policy engine
+ * (which still runs after confirmation).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { parseIntent } from "@/lib/llm";
-import { runPolicyEngine, type ParsedIntent } from "@/lib/policy-engine";
 import { resolveAlias } from "@/lib/aliases";
-import { executeTransfer, getAgentAddress } from "@/lib/sui";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -52,7 +57,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // ── 1. LLM parse ──
+  // ── LLM parse ──
   const intent = await parseIntent(rawMessage);
 
   if (intent.action === "unknown") {
@@ -71,8 +76,11 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // ── 2. Resolve aliases to real addresses ──
+  // ── Resolve aliases to real addresses (for display + later policy check) ──
   const resolvedRecipient = resolveAlias(intent.recipient);
+  const wasAlias =
+    resolvedRecipient !== null && resolvedRecipient !== intent.recipient;
+
   if (!resolvedRecipient) {
     const updated = await db.agentRequest.update({
       where: { id: request.id },
@@ -85,96 +93,86 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({
       id: updated.id,
-      parsedIntent: { action: "transfer", amountSui: intent.amountSui, recipient: intent.recipient },
+      parsedIntent: {
+        action: "transfer",
+        amountSui: intent.amountSui,
+        recipient: intent.recipient,
+      },
       status: "FAILED",
       failReason: `Could not resolve "${intent.recipient}" to a known alias or valid Sui address`,
     });
   }
 
-  const parsedIntent: ParsedIntent = {
-    action: "transfer",
+  // ── Stage as AWAITING_CONFIRMATION — the user must confirm before execution ──
+  const parsedIntent = {
+    action: "transfer" as const,
     amountSui: intent.amountSui,
     recipient: resolvedRecipient,
+    recipientAlias: wasAlias ? intent.recipient : null,
+    rawRecipient: intent.recipient,
   };
 
-  // ── 3. Compute daily spend context ──
-  const now = new Date();
-  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const executedToday = await db.agentRequest.aggregate({
-    where: {
-      status: "EXECUTED",
-      createdAt: { gte: twentyFourHoursAgo },
-    },
-    _sum: { amountSui: true },
-  });
-  const spentTodaySui = executedToday._sum.amountSui ?? 0;
-
-  // ── 4. Load enabled rules and run policy engine ──
-  const rules = await db.rule.findMany();
-  const decision = runPolicyEngine(parsedIntent, rules as any, { spentTodaySui });
-
-  if (decision.decision === "BLOCKED") {
-    const updated = await db.agentRequest.update({
-      where: { id: request.id },
-      data: {
-        status: "BLOCKED",
-        parsedIntent: JSON.stringify(parsedIntent),
-        amountSui: intent.amountSui,
-        recipient: resolvedRecipient,
-        failedRule: decision.failedRule,
-        failReason: decision.reason,
-      },
-    });
-    return NextResponse.json({
-      id: updated.id,
-      parsedIntent,
-      status: "BLOCKED",
-      failedRule: decision.failedRule,
-      failReason: decision.reason,
-    });
-  }
-
-  // ── 5. APPROVED → execute the real Sui testnet transfer ──
-  const agentAddress = getAgentAddress();
-  const txResult = await executeTransfer(resolvedRecipient, intent.amountSui);
-
-  if (txResult.status === "success") {
-    const updated = await db.agentRequest.update({
-      where: { id: request.id },
-      data: {
-        status: "EXECUTED",
-        parsedIntent: JSON.stringify(parsedIntent),
-        amountSui: intent.amountSui,
-        recipient: resolvedRecipient,
-        txDigest: txResult.digest,
-      },
-    });
-    return NextResponse.json({
-      id: updated.id,
-      parsedIntent,
-      status: "EXECUTED",
-      txDigest: txResult.digest,
-      agentAddress,
-    });
-  }
-
-  // Execution failed — log the failure reason but preserve the approval.
   const updated = await db.agentRequest.update({
     where: { id: request.id },
     data: {
-      status: "FAILED",
+      status: "AWAITING_CONFIRMATION",
       parsedIntent: JSON.stringify(parsedIntent),
       amountSui: intent.amountSui,
       recipient: resolvedRecipient,
-      failReason: txResult.errorMessage || "Sui execution failed",
-      ...(txResult.digest ? { txDigest: txResult.digest } : {}),
     },
   });
+
   return NextResponse.json({
     id: updated.id,
     parsedIntent,
-    status: "FAILED",
-    failReason: txResult.errorMessage || "Sui execution failed",
-    agentAddress,
+    rawMessage,
+    status: "AWAITING_CONFIRMATION",
+    // The UI uses these to render the diff between user's words and parsed intent
+    diff: {
+      amountMentioned: extractAmountFromMessage(rawMessage),
+      amountParsed: intent.amountSui,
+      recipientMentioned: intent.recipient,
+      recipientResolved: resolvedRecipient,
+      recipientWasAlias: wasAlias,
+    },
   });
+}
+
+/**
+ * Best-effort extraction of any number + unit from the raw message,
+ * for diff display. Used to highlight when the LLM parsed a different
+ * amount than what the user typed.
+ */
+function extractAmountFromMessage(message: string): number | null {
+  // Look for patterns like "5 SUI", "0.5 sui", "ten SUI"
+  const lower = message.toLowerCase();
+  const wordNumbers: Record<string, number> = {
+    zero: 0,
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    eleven: 11,
+    twelve: 12,
+    twenty: 20,
+    fifty: 50,
+    hundred: 100,
+    thousand: 1000,
+  };
+  for (const [word, num] of Object.entries(wordNumbers)) {
+    if (new RegExp(`\\b${word}\\b`, "i").test(lower)) {
+      return num;
+    }
+  }
+  const match = lower.match(/(\d+(?:\.\d+)?)\s*sui/);
+  if (match) return Number(match[1]);
+  const numMatch = lower.match(/(\d+(?:\.\d+)?)/);
+  if (numMatch) return Number(numMatch[1]);
+  return null;
 }

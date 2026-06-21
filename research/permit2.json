@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.permit.io",
+    "name": "Permit.io | Permissions for the AI Era",
+    "snippet": "Permit.io unifies policy, delegation, approvals, trust, and audit into one action-time policy fabric — for humans, services, and AI agents.",
+    "host_name": "www.permit.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/blog/authorization-as-a-service",
+    "name": "What is Authorization as a Service? - Permit.io",
+    "snippet": "Authorization as a Service is a solution that allows developers to manage user access and permissions in applications efficiently without having to build this ...",
+    "host_name": "www.permit.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/blog/what-is-authorization",
+    "name": "What is Authorization - Permit.io",
+    "snippet": "Authorization is the critical and most advanced part of Identity Access Management (IAM). Here are the differences between IM, AuthN, and AuthZ.",
+    "host_name": "www.permit.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/cli",
+    "name": "Developer-First Integrated Authorization - Permit.io",
+    "snippet": "Use natural language commands with AI to instantly set up and enforce fine-grained authorization policies. Integrate policy enforcement into code. Run policy ...",
+    "host_name": "www.permit.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.permit.io/blog/salt-security-enterprise-grade-api-security-with-fine-grained-authorization",
+    "name": "Salt Security: Enterprise-Grade API Security with Fine-Grained",
+    "snippet": "Fine-Grained Authorization (FGA) with Permit.io to handle dynamic roles, policy-based access, and large-scale identity integrations",
+    "host_name": "www.permit.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

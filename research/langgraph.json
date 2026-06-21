@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://docs.langchain.com/oss/python/langchain/human-in-the-loop",
+    "name": "Human-in-the-loop - Docs by LangChain",
+    "snippet": "An interrupt is triggered when a tool call matches the policy you configured in interrupt_on . ... Use approve to approve the tool call as-is and execute ...",
+    "host_name": "docs.langchain.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.langchain.com/oss/python/deepagents/human-in-the-loop",
+    "name": "Human-in-the-loop - Docs by LangChain",
+    "snippet": "When the agent calls multiple tools that require approval, all interrupts are batched together in a single interrupt. You must provide decisions for each one in ...",
+    "host_name": "docs.langchain.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/LangChain/comments/1ci3m0k/toolcalling_agents_human_approval_before_tool",
+    "name": "Tool-calling agents: Human approval before tool invocation? - Reddit",
+    "snippet": "It seems like a safer method to \"interrupt\" before or after a tool is used as apposed to trusting the agent to use the human-as-a-tool properly, ...",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@sitabjapal03/langgraph-part-4-human-in-the-loop-for-reliable-ai-workflows-aa4cc175bce4",
+    "name": "LangGraph (Part 4): Human-in-the-Loop for Reliable AI Workflows",
+    "snippet": "Observe that a tool call is detected, and then interrupt the flow to ask for a human review of this tool call before proceeding with execution.",
+    "host_name": "medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8_UQNWTbvEQ",
+    "name": "Use Dynamic Human in the Loop Interruption in Prebuilt AI Agents",
+    "snippet": "... tool calls pause for human approval before running. You'll see how ... interrupt only when needed, and resume execution after approval or ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.langchain.com/oss/javascript/langgraph/interrupts",
+    "name": "Interrupts - Docs by LangChain",
+    "snippet": "Stream with human-in-the-loop ... This makes the tool itself pause for approval whenever it's called, and allows for human review and editing of the tool call ...",
+    "host_name": "docs.langchain.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

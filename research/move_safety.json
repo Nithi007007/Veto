@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://medium.com/@jordanbishop_40628/move-vs-solidity-evaluating-the-languages-powering-smart-contracts-491138eb34ca",
+    "name": "Move vs Solidity: Evaluating the Languages Powering Smart Contracts",
+    "snippet": "Move lacks Solidity's high degree of flexibility, and its focus on limited mutability and stringent safety checks can pose constraints. Move ...\nIn stark contrast to Solidity, Move is designed with a strong emphasis on safety and security for the Diem blockchain. It strategically combats ...",
+    "host_name": "medium.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2502.18515v2",
+    "name": "Securing Smart Contract Languages with a Unified Agentic  - arXiv",
+    "snippet": "This research employs a multi-faceted approach to investigate the security of smart contracts, focusing on both Solidity and Move programming languages. The ...",
+    "host_name": "arxiv.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/mbogan/smart-contract-language-comparison-cadence-vs-solidity-vs-move-3gi6",
+    "name": "Smart Contract Language Comparison - Cadence vs Solidity vs Move",
+    "snippet": "The language enforces strict type checking to prevent common errors. While Solidity and Move require compilation, Cadence is interpreted. ...\nType Safety: The language enforces strict type checking to prevent common errors. Resource-oriented Programming: Resources are unique ...",
+    "host_name": "dev.to",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/solidity/comments/17s9d0t/is_solidity_really_that_bad",
+    "name": "Is Solidity Really THAT Bad? : r/solidity - Reddit",
+    "snippet": "The ecosystems for blockchain languages are in general pretty immature, but solidity has the best tools available to enable you to write secure ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://chain.link/education-hub/smart-contract-programming-languages",
+    "name": "Top 6 Smart Contract Languages in 2024 - Chainlink",
+    "snippet": "Move introduces a novel system built on three core premises—first-class resources, improved safety, and upgrade verifiability.\nMove introduces a novel system built on three core premises—first-class resources, improved safety, and upgrade verifiability. Most notably, ...",
+    "host_name": "chain.link",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

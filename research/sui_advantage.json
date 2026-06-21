@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://research.grayscale.com/reports/why-sui-stands-out",
+    "name": "Built for Scale: Why Sui Stands Out - Grayscale Research",
+    "snippet": "Sui is a next-generation blockchain engineered for scale and designed to support mass-market consumer applications (among other things).",
+    "host_name": "research.grayscale.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.sui.io/develop/write-move/sui-move-concepts",
+    "name": "Move Concepts | Sui Documentation",
+    "snippet": "Sui takes advantage of Move's security and flexibility, enhancing it with the features to vastly improve throughput, reduce delays in finalityFinalityThe state ...",
+    "host_name": "docs.sui.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://members.delphidigital.io/reports/sui-network-demystifying-the-monolithic-contender",
+    "name": "Sui Network: Demystifying the Monolithic Contender - Delphi Digital",
+    "snippet": "In this report, we will dive into Sui's architecture, economics, and innovations and look at how its ecosystem is shaping up.",
+    "host_name": "members.delphidigital.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/sui/comments/1h10m98/what_factors_make_you_believe_that_sui_is_the",
+    "name": "What factors make you believe that SUI is the best blockchain?",
+    "snippet": "Innovative Technology: • Parallel Execution: Sui's ability to process transactions in parallel can lead to superior scalability and efficiency, ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://research.4pillars.io/en/research/sui-network",
+    "name": "Sui: Why Do We Need Another Layer 1? - FP RESEARCH",
+    "snippet": "If these features – zkLogin, zkSend, and Sponsored Transactions – gain traction, they could seamlessly integrate many into the Web3 world.",
+    "host_name": "research.4pillars.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coinmerce.io/en/sui/information",
+    "name": "Sui (SUI) + kopen | o.a. iDEAL & SEPA | Coinmerce",
+    "snippet": "Sui stands out in several ways: Parallel transaction execution: reduced wait times, higher throughput. Object-based architecture: everything on-chain is treated ...",
+    "host_name": "coinmerce.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

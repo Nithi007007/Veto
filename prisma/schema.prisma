@@ -1,5 +1,5 @@
-// Veto — Prisma schema
-// Deterministic policy gate for AI agents that hold and move money on Sui.
+// Veto — Prisma schema (v2)
+// Deterministic, verifiable policy gate for AI agents on Sui.
 
 generator client {
   provider = "prisma-client-js"
@@ -28,9 +28,21 @@ model AgentRequest {
   parsedIntent String?  // JSON-encoded
   amountSui    Float?
   recipient    String?
-  status       String   @default("PENDING") // PENDING | APPROVED | BLOCKED | EXECUTED | FAILED
+  status       String   @default("PENDING") // PENDING | APPROVED | BLOCKED | EXECUTED | FAILED | AWAITING_CONFIRMATION
   failedRule   String?
   failReason   String?
   txDigest     String?
+  // For two-step confirmation flow: when status = AWAITING_CONFIRMATION,
+  // the parsed intent is staged but not yet executed. User must confirm.
+  // Set to the timestamp when user confirmed (null until then).
+  confirmedAt  DateTime?
   createdAt    DateTime @default(now())
+}
+
+model RuleBookCommit {
+  id          String   @id @default(cuid())
+  commitHash  String   // SHA-256 of canonical rule set JSON (0x-prefixed hex)
+  version     Int      // monotonically increasing
+  txDigest    String?  // null in simulator mode; real digest once Move is deployed
+  createdAt   DateTime @default(now())
 }

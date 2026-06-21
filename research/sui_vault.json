@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://docs.sui.io/develop/objects/derived-objects",
+    "name": "Derived Objects - Sui Documentation",
+    "snippet": "Sui objects get a unique ID assigned to them upon creation. However, a derived object has a claimed ID created through the mapping of a parent object to a key.\nYou can compute derived object IDs using the parent ID and key, both onchain and offchain, even before creating the object on the network. Parent objects can be ...",
+    "host_name": "docs.sui.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=m2gsaKX5jrM",
+    "name": "Understanding Transfer-to-Object in Sui - YouTube",
+    "snippet": "In this workshop, we'll go through some examples of the transfer-to-object feature and discuss how this new feature can be useful for ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://move-book.com/object/ownership",
+    "name": "Ownership | The Move Book",
+    "snippet": "Sui introduces four distinct ownership types for objects: single owner, shared state, immutable shared state, and object-owner.",
+    "host_name": "move-book.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/sui-foundation/sui-move-intro-course/blob/main/unit-two/lessons/2_ownership.md",
+    "name": "sui-move-intro-course/unit-two/lessons/2_ownership.md at main",
+    "snippet": "Shared Mutable Objects. Shared objects in Sui can be read or mutated by anyone. Shared object transactions require global ordering through a consensus layer ...",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.trailofbits.com/2025/09/10/how-sui-move-rethinks-flash-loan-security",
+    "name": "How Sui Move rethinks flash loan security - The Trail of Bits Blog",
+    "snippet": "Sui's Move language significantly improves flash loan security by replacing Solidity's reliance on callbacks and runtime checks with a “hot ...",
+    "host_name": "blog.trailofbits.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/eincode/learn-move-for-sui-11-key-concepts-explained-simply-39299763959c",
+    "name": "Learn Move for Sui: 11 Key Concepts Explained Simply | by Filip Jerga",
+    "snippet": "This guide covers 11 fundamental concepts that will give you a solid foundation in Move and set you on the path to building your own Sui dApps.",
+    "host_name": "medium.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

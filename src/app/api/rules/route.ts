@@ -1,11 +1,13 @@
 /**
- * GET  /api/rules     — list all rules
- * POST /api/rules     — create a new rule
+ * GET  /api/rules     — list all rules + current vault state
+ * POST /api/rules     — create a new rule (Owner only) → triggers vault commit
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { requireOwner } from "@/lib/auth";
+import { commitRulesToVault, getVaultState, getLatestCommit } from "@/lib/vault";
 
 export const runtime = "nodejs";
 
@@ -23,7 +25,6 @@ const CreateRuleSchema = z.object({
 });
 
 function buildConfigString(type: string, config: any): string {
-  // Normalize config based on rule type so the policy engine reads cleanly.
   switch (type) {
     case "MAX_AMOUNT_PER_TX":
       return JSON.stringify({ maxAmountSui: Number(config.maxAmountSui) });
@@ -45,10 +46,16 @@ export async function GET() {
   const rules = await db.rule.findMany({
     orderBy: { createdAt: "asc" },
   });
-  return NextResponse.json({ rules });
+  const vault = await getVaultState();
+  const commit = await getLatestCommit();
+  return NextResponse.json({ rules, vault, commit });
 }
 
 export async function POST(req: NextRequest) {
+  // Owner-only
+  const auth = requireOwner(req);
+  if (auth) return auth;
+
   let body: any;
   try {
     body = await req.json();
@@ -71,5 +78,9 @@ export async function POST(req: NextRequest) {
     data: { name, type, config: configStr },
   });
 
-  return NextResponse.json({ rule }, { status: 201 });
+  // Commit the new rule set to the vault (on-chain in prod, simulated here)
+  const allRules = (await db.rule.findMany({ orderBy: { createdAt: "asc" } })) as any;
+  const commit = await commitRulesToVault(allRules);
+
+  return NextResponse.json({ rule, commit }, { status: 201 });
 }

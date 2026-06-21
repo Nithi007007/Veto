@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://community.openai.com/t/financial-guardrails-for-openai-agents-how-are-you-handling-this/1382995",
+    "name": "Financial guardrails for OpenAI agents — how are you handling this?",
+    "snippet": "An agent with access to a payment API, a billing tool, or a crypto wallet can spend real money — often with no hard limit stopping it.",
+    "host_name": "community.openai.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.aimagicx.com/blog/ai-agent-spending-guardrails-budget-caps-2026",
+    "name": "AI Agent Spending Guardrails: Budget Caps and Kill Switches That",
+    "snippet": "Autonomous agents can burn through a month of budget overnight. Spending guardrails — per-run caps, per-workflow budgets, rate limits, and kill ...",
+    "host_name": "www.aimagicx.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.openai.com/en/articles/11165333-chatgpt-enterprise-and-edu-models-limits",
+    "name": "ChatGPT Enterprise and Edu - Models & Limits - OpenAI Help Center",
+    "snippet": "As of February 13, 2026, models GPT-4o, GPT-4.1, GPT-4.1 mini, OpenAI o4-mini, and GPT-5 (Instant and Thinking) have been retired from ChatGPT and are no longer ...",
+    "host_name": "help.openai.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.bentoml.com/blog/chatgpt-usage-limits-explained-and-how-to-remove-them",
+    "name": "ChatGPT Usage Limits: What They Are and How to Get Rid of Them",
+    "snippet": "Learn ChatGPT usage limits for Free, Go, Plus, Business, and Pro plans (2026 update). Understand why they exist and how to remove them with ...",
+    "host_name": "www.bentoml.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cnbc.com/2026/02/28/ai-selloff-politics-agents.html",
+    "name": "AI just leveled up and there are no guardrails anymore - CNBC",
+    "snippet": "The tension around AI safety has the potential to be a pivotal issue in the 2026 midterms, and one race is already signaling how it might shake ...",
+    "host_name": "www.cnbc.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]
