@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 const PatchSchema = z.object({
   enabled: z.boolean().optional(),
   name: z.string().min(1).max(80).optional(),
-  config: z.record(z.any()).optional(),
+  config: z.record(z.string(), z.unknown()).optional(),
 });
 
 function buildConfigString(type: string, config: any): string {

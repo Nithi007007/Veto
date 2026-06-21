@@ -16,13 +16,25 @@ AI agents are starting to hold real wallets (Truth Terminal, ElizaOS, Coinbase A
 
 **The off-chain policy engine is the runtime. The on-chain vault is the backstop. Both must agree for a transaction to land.** If the off-chain engine is compromised, the on-chain caps still hold.
 
-## The three layers of defense
+## The three layers of defense (with explicit threat model)
 
-| Layer | What it does | What it protects against |
+| Layer | What it does | Threat mitigated |
 |---|---|---|
-| **1. Two-step confirmation** (UI) | LLM parses intent → user must explicitly confirm the parsed amount + recipient before any policy check or chain call | LLM hallucinations, prompt injection that produces wrong parsed intents |
-| **2. Off-chain policy engine** (TS) | Deterministic rule checks: per-tx cap, daily cap, allowlist, denylist | Prompt injection that proposes a syntactically-valid but policy-violating action |
-| **3. On-chain vault** (Move) | Hard per_tx_cap + daily_cap enforced atomically in `vault::spend()`. Rule book hash committed on every change. | Backend compromise, DB compromise, off-chain engine tampering, race conditions |
+| **1. Two-step confirmation** (UI) | LLM parses intent → user must explicitly confirm the parsed amount + recipient before any policy check or chain call | **T2 — LLM hallucination** (model fabricates amount/recipient), **T3 — compromised LLM response** (MITM injects fake completion) |
+| **2. Off-chain policy engine** (TS) | Deterministic rule checks: per-tx cap, daily cap, allowlist, denylist. **Zero API calls inside the policy function.** | **T1 — prompt injection** (injected instruction still has to clear amount caps and address lists regardless of how it was produced) |
+| **3. On-chain vault** (Move) | Hard per_tx_cap + daily_cap enforced atomically in `vault::spend()`. Rule book hash committed on every change. **OwnerCap pattern: protocol-level authorization, not app-level.** | **T4 — rule book tampering** (DB edits bypassing /api/rules show up as hash mismatch), **T6 — Owner/Agent boundary** (OwnerCap object required to call configure/commit_rules; rejected at protocol level if absent) |
+| **4. Idempotency key** (T5) | Hash of (message + amount + recipient) checked against recent EXECUTED requests. 60-second window. | **T5 — replay / double-submit** (network retry executes same transfer twice) |
+
+### Threat model — explicit, named
+
+| Threat | Scenario | Mitigation | Demo-able? |
+|---|---|---|---|
+| **T1** Prompt injection | Agent reads untrusted external content (a webpage, a message) containing a hidden instruction | Policy engine evaluates the final structured intent regardless of *how* it was produced — injected instruction still has to clear caps and lists | Yes — type an injected-looking instruction, show it blocked |
+| **T2** LLM hallucination | Model fabricates an amount/recipient that wasn't actually intended | `zod` validation + hard caps apply regardless of intent source + two-step confirmation | Yes — type "ten SUI to alice", see the parsed 10 SUI, reject if wrong |
+| **T3** Compromised LLM response | Bad API response or MITM injects a fake completion | Policy engine doesn't trust the upstream source — it's the last line of defense by design | Architecturally shown — policy-engine.ts has zero LLM imports |
+| **T4** Rule book tampering | Someone edits rules directly in the DB, bypassing /api/rules | On-chain commit hash; UI recomputes local hash on every load and shows red "RULES DON'T MATCH" banner on mismatch | **Yes — live demo: edit DB directly, see red banner fire** |
+| **T5** Replay / double-submit | Network retry executes the same transfer twice | Idempotency key (hash of message + amount + recipient), 60-second window | Yes — submit same intent twice rapidly, second one blocked |
+| **T6** Owner/Agent boundary | "Two route names" isn't real access control — anyone hitting the API could call /api/rules | OWNER_PASSWORD env var + signed session cookie (v1) + OwnerCap object on Sui (production). The Sui runtime checks object ownership BEFORE your Move code runs | **Yes — curl /api/rules without cookie → 401; in production, show rejected no-cap tx on-chain** |
 
 ## The Owner ↔ Agent trust boundary (named, not implicit)
 
@@ -187,12 +199,15 @@ In v1 (current): the off-chain simulator in `src/lib/vault.ts` mirrors the Move 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
 | `POST` | `/api/agent/message` | None (Agent) | LLM parse → stage as AWAITING_CONFIRMATION |
-| `POST` | `/api/agent/confirm` | None (Agent) | Vault pre-flight + policy engine + SUI execution |
+| `POST` | `/api/agent/confirm` | None (Agent) | Idempotency check (T5) → vault pre-flight → policy engine → SUI execution |
 | `GET` | `/api/requests?limit=20` | None | Activity feed |
-| `GET` | `/api/rules` | None (read) | List rules + current vault state + latest commit |
-| `POST` | `/api/rules` | **Owner token** | Create rule → triggers vault re-commit |
-| `PATCH` | `/api/rules/:id` | **Owner token** | Toggle/edit → triggers vault re-commit |
-| `DELETE` | `/api/rules/:id` | **Owner token** | Delete → triggers vault re-commit |
+| `GET` | `/api/rules` | None (read) | List rules + current vault state + latest commit + **tamper detection flag** |
+| `POST` | `/api/rules` | **Owner cookie/token** | Create rule → triggers vault re-commit (returns `commitDurationMs`) |
+| `PATCH` | `/api/rules/:id` | **Owner cookie/token** | Toggle/edit → triggers vault re-commit |
+| `DELETE` | `/api/rules/:id` | **Owner cookie/token** | Delete → triggers vault re-commit |
+| `POST` | `/api/owner/login` | None | Verify password → set signed session cookie |
+| `POST` | `/api/owner/logout` | None | Clear session cookie |
+| `GET` | `/api/owner/status` | None | Returns `{ authenticated: boolean }` |
 | `GET` | `/api/wallet` | None | Read-only wallet info |
 | `GET` | `/api/aliases` | None | Known recipient aliases |
 | `POST` | `/api/seed` | None | Seed default rules + initial commit (idempotent) |
@@ -224,7 +239,12 @@ Open `http://localhost:3000` — the app auto-seeds three default rules + initia
 | `DATABASE_URL` | SQLite or Postgres connection string | `file:./db/veto.db` |
 | `SUI_AGENT_SECRET_KEY` | Ed25519 private key for the agent's testnet wallet | `suiprivkey1q...` |
 | `SUI_NETWORK` | Sui network to use | `testnet` |
-| `OWNER_TOKEN` | Bearer token required for `/api/rules*` routes (Owner role) | `dev-owner-token` |
+| `OWNER_PASSWORD` | Password for `POST /api/owner/login` (sets session cookie) | `dev-owner-password` |
+| `OWNER_TOKEN` | (optional) Bearer token for API clients — alternative to cookie | `dev-owner-token` |
+| `OWNER_COOKIE_SECRET` | (optional) HMAC secret for signing session cookies. Defaults to `OWNER_PASSWORD` if not set | `random-32-byte-hex` |
+| `VAULT_OBJECT_ID` | (production) Shared `Vault` object ID, returned by `sui client publish` | `0x...` |
+| `VAULT_PACKAGE_ID` | (production) Package ID, returned by publish | `0x...` |
+| `OWNER_CAP_ID` | (production) `OwnerCap` object ID — kept server-side only | `0x...` |
 
 ### Generating a fresh agent keypair
 
@@ -245,6 +265,52 @@ The agent's testnet wallet needs SUI for the EXECUTED flow to actually land on-c
 4. The EXECUTED flow will now succeed for any transfer within the policy rules
 
 If the wallet is unfunded, the EXECUTED flow still runs through the policy engine and on-chain vault pre-flight, then returns a meaningful "insufficient balance" error — proving the entire pipeline works. The BLOCKED flows are completely unaffected (they never touch the chain).
+
+## Why Sui specifically (the OwnerCap argument)
+
+The honest version of "why Sui": nothing in the basic pitch couldn't run on any chain with a `require(msg.sender == owner)` check. The Sui-specific version is the **OwnerCap capability pattern**.
+
+The Move module is designed so updating the rule registry requires *possessing a capability object*, not just passing a permission check in code:
+
+```move
+public struct OwnerCap has key, store {}
+
+public fun commit_rules(
+    _cap: &OwnerCap,
+    registry: &mut Vault,
+    new_hash: vector<u8>,
+) {
+    registry.rules_commit_hash = new_hash;
+    registry.rules_version = registry.rules_version + 1;
+}
+```
+
+On an account-based chain (Ethereum, Solana, etc.), "only the owner can do this" lives entirely inside mutable application code. On Sui, possessing the right object *is* the authorization — the runtime checks object ownership before your Move code even runs. A transaction that doesn't include the `OwnerCap` literally cannot call `commit_rules` or `configure`, full stop, at the protocol level.
+
+**This is demo-able as fact, not asserted as a slide:** try the call without the cap in a Sui CLI terminal, show it get rejected on-chain, clip it or do it live. The app-level password (`OWNER_PASSWORD` env var + cookie) is for convenience — the actual authority boundary is enforced by the chain itself.
+
+This is also the same fix as T6, just enforced one layer deeper — at the chain level instead of (or in addition to) the app level.
+
+## Who buys this — three concrete buyers, not "everyone"
+
+1. **DAOs and treasury teams** delegating limited authority to an agent for routine ops (recurring payments, rebalancing, yield farming). They need enforceable, provable limits *before* a governance vote will approve delegating anything real. The on-chain vault + tamper-evident rule commit is exactly the audit trail their governance committee asks for.
+
+2. **Agent framework providers** (ElizaOS, ai16z, LangChain, CrewAI). Distribution path: bundle Veto's policy layer as a default safety module inside an agent SDK, the way payment processors bundle fraud checks rather than making every merchant build their own. Coinbase already shipped this internally as part of AgentKit — Veto is the open, framework-agnostic version.
+
+3. **Custodians and regulated entities** piloting agentic execution. Compliance teams need an auditable control layer, and "capability-enforced, on-chain-verifiable policy" is language they can actually evaluate — unlike "we trust the model." The enterprise wedge: regulated capital can't move via an AI agent without a provable policy layer between the agent and the wallet.
+
+**Monetization, stated plainly and not oversold:** open-source the policy engine for adoption and trust. Charge for a hosted multi-agent dashboard and compliance export (CSV/PDF audit reports tied to on-chain commit hashes). Standard open-core, easy for a judge to believe.
+
+## Evidence — turn every claim into something shown, not said
+
+| Claim | Live proof |
+|---|---|
+| "Deterministic, not another model" | Show `src/lib/policy-engine.ts`, 5 seconds, point out zero API imports |
+| "Tamper-evident" | Edit a rule via UI → on-chain hash changes → click Explorer. Then edit the DB directly via `sqlite3`/Prisma Studio → red "RULE BOOK TAMPERING DETECTED" banner fires within 15 seconds |
+| "Real transaction" | Click the Explorer link live in the activity feed — not a screenshot |
+| "Owner-only, enforced by Sui" | In production: show the rejected no-cap transaction attempt on Sui Explorer. In v1: show `curl /api/rules` returning 401 without the session cookie |
+| "Fast enough for real iteration" | UI shows actual measured commit time ("committed in 0.002s" simulated, ~1.8s on Sui testnet in production) — not "fast" |
+| "Idempotent" | Submit same intent twice within 60s → second one blocked with `idempotency_check` |
 
 ## Answers to the 20 hard questions
 

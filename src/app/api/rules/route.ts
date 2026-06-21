@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireOwner } from "@/lib/auth";
-import { commitRulesToVault, getVaultState, getLatestCommit } from "@/lib/vault";
+import { commitRulesToVault, getVaultState, getLatestCommit, detectTampering } from "@/lib/vault";
 
 export const runtime = "nodejs";
 
@@ -21,7 +21,7 @@ const RuleTypeSchema = z.enum([
 const CreateRuleSchema = z.object({
   name: z.string().min(1).max(80),
   type: RuleTypeSchema,
-  config: z.record(z.any()),
+  config: z.record(z.string(), z.unknown()),
 });
 
 function buildConfigString(type: string, config: any): string {
@@ -48,7 +48,9 @@ export async function GET() {
   });
   const vault = await getVaultState();
   const commit = await getLatestCommit();
-  return NextResponse.json({ rules, vault, commit });
+  // T4: tamper detection — recompute local hash, compare to last commit
+  const tamper = await detectTampering();
+  return NextResponse.json({ rules, vault, commit, tamper });
 }
 
 export async function POST(req: NextRequest) {
@@ -79,6 +81,8 @@ export async function POST(req: NextRequest) {
   });
 
   // Commit the new rule set to the vault (on-chain in prod, simulated here)
+  // commitDurationMs is measured and returned so the UI can show
+  // "committed in X.Xs" — turning "fast" into a real number.
   const allRules = (await db.rule.findMany({ orderBy: { createdAt: "asc" } })) as any;
   const commit = await commitRulesToVault(allRules);
 

@@ -4,12 +4,21 @@
  * Step 2 of the two-step flow. After the user reviews the parsed intent
  * (returned by /api/agent/message), they explicitly confirm or reject.
  *
+ * T5 mitigation: idempotency key.
+ *   - Hash of (rawMessage + amountSui + recipient) is computed before
+ *     execution.
+ *   - If a request with the same hash was EXECUTED in the last 60 seconds,
+ *     this one is rejected as a duplicate (replay/double-submit guard).
+ *   - Cheap (~one indexed query), prevents network retries from
+ *     double-spending.
+ *
  * On confirm:
  *   1. Load the staged AgentRequest (status must be AWAITING_CONFIRMATION)
- *   2. Run the on-chain vault pre-flight (per_tx_cap, daily_cap)
- *   3. Run the off-chain policy engine (allowlist, denylist, etc.)
- *   4. If both pass → execute the real SUI testnet transfer
- *   5. Update the request row with the final status + txDigest
+ *   2. Idempotency check (T5)
+ *   3. On-chain vault pre-flight (per_tx_cap, daily_cap)
+ *   4. Off-chain policy engine (allowlist, denylist, etc.)
+ *   5. If both pass → execute the real SUI testnet transfer
+ *   6. Update the request row with the final status + txDigest
  *
  * On reject:
  *   - Update status to BLOCKED with failedRule="user_rejected"
@@ -17,6 +26,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { db } from "@/lib/db";
 import { runPolicyEngine, type ParsedIntent } from "@/lib/policy-engine";
 import { executeTransfer, getAgentAddress } from "@/lib/sui";
@@ -32,6 +42,18 @@ const ConfirmSchema = z.object({
   id: z.string().min(1),
   decision: z.enum(["confirm", "reject"]),
 });
+
+const IDEMPOTENCY_WINDOW_MS = 60 * 1000; // 60 seconds
+
+function computeIdempotencyKey(
+  rawMessage: string,
+  amountSui: number,
+  recipient: string
+): string {
+  return createHash("sha256")
+    .update(`${rawMessage}|${amountSui}|${recipient}`)
+    .digest("hex");
+}
 
 export async function POST(req: NextRequest) {
   let body: any;
@@ -95,6 +117,45 @@ export async function POST(req: NextRequest) {
       id: updated.id,
       status: "FAILED",
       failReason: "Missing parsed intent data",
+    });
+  }
+
+  // ── T5: Idempotency check ──
+  // Reject if the same (message, amount, recipient) was EXECUTED in the
+  // last 60 seconds. Prevents replay / network-retry double-submits.
+  const idempotencyKey = computeIdempotencyKey(
+    staged.rawMessage,
+    staged.amountSui,
+    staged.recipient
+  );
+  const idempotencyWindowStart = new Date(Date.now() - IDEMPOTENCY_WINDOW_MS);
+  const recentDuplicate = await db.agentRequest.findFirst({
+    where: {
+      status: "EXECUTED",
+      amountSui: staged.amountSui,
+      recipient: staged.recipient,
+      rawMessage: staged.rawMessage,
+      confirmedAt: { gte: idempotencyWindowStart },
+      id: { not: id }, // exclude the current request
+    },
+    select: { id: true, confirmedAt: true },
+  });
+  if (recentDuplicate) {
+    const updated = await db.agentRequest.update({
+      where: { id },
+      data: {
+        status: "BLOCKED",
+        failedRule: "idempotency_check",
+        failReason: `Duplicate of request ${recentDuplicate.id} executed at ${recentDuplicate.confirmedAt?.toISOString()}. Idempotency window: 60s.`,
+        confirmedAt: new Date(),
+      },
+    });
+    return NextResponse.json({
+      id: updated.id,
+      status: "BLOCKED",
+      failedRule: "idempotency_check",
+      failReason:
+        "Blocked as a duplicate within the 60-second idempotency window (T5 replay protection).",
     });
   }
 
@@ -179,6 +240,7 @@ export async function POST(req: NextRequest) {
       status: "EXECUTED",
       txDigest: txResult.digest,
       agentAddress,
+      idempotencyKey,
     });
   }
 

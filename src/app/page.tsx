@@ -57,12 +57,11 @@ import {
   GitCommit,
 } from "lucide-react";
 
-// Owner token — in v1 this is a static dev token. The chat UI (Agent role)
-// never sends it; only the rules UI (Owner role) does.
-const OWNER_TOKEN =
-  typeof window !== "undefined"
-    ? window.localStorage.getItem("veto_owner_token") || "dev-owner-token"
-    : "dev-owner-token";
+// Owner auth: in v2 we use a session cookie set by POST /api/owner/login.
+// The browser sends the cookie automatically on all same-origin requests;
+// no manual token needed. The requireOwner() middleware on the server
+// validates either the cookie or the x-owner-token header (for API clients).
+// The chat UI (Agent role) never logs in — so it can never reach /api/rules.
 
 // ─── Types ────────────────────────────────────────────────────────────
 type Rule = {
@@ -121,6 +120,17 @@ type VaultCommit = {
   version: number;
   txDigest: string | null;
   createdAt: string;
+};
+
+type TamperState = {
+  tampered: boolean;
+  currentHash: string;
+  committedHash: string;
+  lastCommittedAt: Date | null;
+};
+
+type OwnerStatus = {
+  authenticated: boolean;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -200,6 +210,12 @@ export default function VetoDashboard() {
   );
   const [vault, setVault] = useState<VaultState | null>(null);
   const [commit, setCommit] = useState<VaultCommit | null>(null);
+  const [tamper, setTamper] = useState<TamperState | null>(null);
+  const [ownerStatus, setOwnerStatus] = useState<OwnerStatus>({ authenticated: false });
+  const [lastCommitMs, setLastCommitMs] = useState<number | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -249,10 +265,59 @@ export default function VetoDashboard() {
       setRules(data.rules || []);
       setVault(data.vault || null);
       setCommit(data.commit || null);
+      setTamper(data.tamper || null);
     } catch {
       /* ignore */
     }
   }, []);
+
+  const fetchOwnerStatus = useCallback(async () => {
+    try {
+      const r = await fetch("/api/owner/status");
+      if (r.ok) {
+        const data = await r.json();
+        setOwnerStatus(data);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const handleLogin = async () => {
+    if (!loginPassword) return;
+    setLoggingIn(true);
+    try {
+      const r = await fetch("/api/owner/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: loginPassword }),
+      });
+      const data = await r.json();
+      if (r.ok) {
+        toast.success("Owner session established");
+        setLoginOpen(false);
+        setLoginPassword("");
+        await fetchOwnerStatus();
+        await fetchRules();
+      } else {
+        toast.error(data.error || "Login failed");
+      }
+    } catch (e: any) {
+      toast.error("Network error: " + (e?.message || "unknown"));
+    } finally {
+      setLoggingIn(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/owner/logout", { method: "POST" });
+      toast.info("Logged out");
+      await fetchOwnerStatus();
+    } catch {
+      /* ignore */
+    }
+  };
 
   const fetchAliases = useCallback(async () => {
     try {
@@ -280,11 +345,15 @@ export default function VetoDashboard() {
     fetchWallet();
     fetchRules();
     fetchAliases();
+    fetchOwnerStatus();
     pollingRef.current = setInterval(fetchRequests, 4000);
+    // Re-check tamper detection every 15s
+    const tamperInterval = setInterval(fetchRules, 15000);
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current);
+      clearInterval(tamperInterval);
     };
-  }, [fetchRequests, fetchWallet, fetchRules, fetchAliases]);
+  }, [fetchRequests, fetchWallet, fetchRules, fetchAliases, fetchOwnerStatus]);
 
   useEffect(() => {
     if (rules.length === 0 && !loadingRequests) {
@@ -412,10 +481,54 @@ export default function VetoDashboard() {
                   v{commit.version}
                 </Badge>
               )}
+              {ownerStatus.authenticated ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 text-[10px]"
+                  onClick={handleLogout}
+                >
+                  <Lock className="h-3 w-3 text-emerald-600" />
+                  OWNER
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 gap-1.5 text-[10px]"
+                  onClick={() => setLoginOpen(true)}
+                >
+                  <Lock className="h-3 w-3" />
+                  LOGIN
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </header>
+
+      {/* T4: Tamper detection banner — fires when DB rules don't match last committed hash */}
+      {tamper?.tampered && (
+        <div className="bg-red-600 text-white border-b border-red-800">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex items-start gap-3 text-sm">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <strong className="font-bold">RULE BOOK TAMPERING DETECTED.</strong>{" "}
+              <span className="text-red-100">
+                The current rule set in the database does not match the last
+                committed hash. Someone edited rules directly in the DB,
+                bypassing /api/rules. The committed policy (what should be
+                enforced) does not match the runtime policy (what is being
+                enforced).
+              </span>
+              <div className="mt-1.5 font-mono text-[10px] text-red-100">
+                <div>committed hash: {tamper.committedHash}</div>
+                <div>current hash:&nbsp;&nbsp;&nbsp;{tamper.currentHash}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main */}
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
@@ -715,6 +828,9 @@ export default function VetoDashboard() {
               rules={rules}
               vault={vault}
               commit={commit}
+              tamper={tamper}
+              ownerAuthenticated={ownerStatus.authenticated}
+              onLoginClick={() => setLoginOpen(true)}
               onRefresh={fetchRules}
               aliases={aliases}
             />
@@ -855,6 +971,66 @@ export default function VetoDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Owner login dialog (T6) */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              Owner login
+            </DialogTitle>
+            <DialogDescription>
+              The Owner role is required to edit rules. The Agent role
+              (chat) cannot reach <code className="font-mono">/api/rules</code>{" "}
+              — the boundary is enforced by <code className="font-mono">requireOwner()</code>{" "}
+              middleware. In production, this is replaced by an on-chain{" "}
+              <code className="font-mono">OwnerCap</code> capability object:
+              the Sui runtime rejects any tx that doesn&apos;t include it.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Owner password
+              </label>
+              <Input
+                type="password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleLogin();
+                }}
+                placeholder="Enter owner password"
+                className="font-mono text-sm"
+                autoFocus
+              />
+            </div>
+            <div className="rounded-md border border-dashed border-border bg-muted/20 p-2 text-[10px] text-muted-foreground">
+              <strong className="text-foreground">Demo password:</strong>{" "}
+              <code className="font-mono">dev-owner-password</code>
+              <br />
+              Set <code className="font-mono">OWNER_PASSWORD</code> env var in production.
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setLoginOpen(false)}
+              disabled={loggingIn}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleLogin}
+              disabled={loggingIn || !loginPassword}
+            >
+              {loggingIn && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
+              Log in
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -947,12 +1123,18 @@ function RulesTab({
   rules,
   vault,
   commit,
+  tamper,
+  ownerAuthenticated,
+  onLoginClick,
   onRefresh,
   aliases,
 }: {
   rules: Rule[];
   vault: VaultState | null;
   commit: VaultCommit | null;
+  tamper: TamperState | null;
+  ownerAuthenticated: boolean;
+  onLoginClick: () => void;
   onRefresh: () => void;
   aliases: { name: string; address: string }[];
 }) {
@@ -964,50 +1146,91 @@ function RulesTab({
   const [newAddresses, setNewAddresses] = useState("");
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState<string | null>(null); // rule id being toggled/deleted
+  const [lastCommitMs, setLastCommitMs] = useState<number | null>(null);
 
-  // Owner-authenticated fetch wrapper
+  // Owner-authenticated fetch wrapper.
+  // Cookies are sent automatically by the browser — no manual token header needed.
+  // If the session cookie is missing/invalid, the server returns 401 and we
+  // surface that with a clear "login required" toast.
   const ownerFetch = async (url: string, options?: RequestInit) => {
-    return fetch(url, {
+    const r = await fetch(url, {
       ...options,
       headers: {
         ...(options?.headers || {}),
-        "x-owner-token": OWNER_TOKEN,
       },
+      credentials: "include", // send the owner session cookie
     });
+    if (r.status === 401) {
+      toast.error("Owner login required to edit rules", {
+        description: "Click the LOGIN button in the header to authenticate.",
+      });
+      throw new Error("Unauthorized — owner login required");
+    }
+    return r;
   };
 
   const toggleEnabled = async (rule: Rule) => {
+    if (!ownerAuthenticated) {
+      onLoginClick();
+      return;
+    }
     setBusy(rule.id);
     try {
-      await ownerFetch(`/api/rules/${rule.id}`, {
+      const r = await ownerFetch(`/api/rules/${rule.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !rule.enabled }),
       });
+      const data = await r.json();
+      if (data.commit?.commitDurationMs !== undefined) {
+        setLastCommitMs(data.commit.commitDurationMs);
+      }
       await onRefresh();
-      toast.success(`Rule ${rule.enabled ? "disabled" : "enabled"} — vault re-committed`);
+      toast.success(
+        `Rule ${rule.enabled ? "disabled" : "enabled"} — vault re-committed${
+          data.commit?.commitDurationMs !== undefined
+            ? ` in ${(data.commit.commitDurationMs / 1000).toFixed(2)}s`
+            : ""
+        }`
+      );
     } catch (e: any) {
-      toast.error("Failed to toggle: " + (e?.message || "unknown"));
+      if (e.message !== "Unauthorized — owner login required") {
+        toast.error("Failed to toggle: " + (e?.message || "unknown"));
+      }
     } finally {
       setBusy(null);
     }
   };
 
   const deleteRule = async (rule: Rule) => {
+    if (!ownerAuthenticated) {
+      onLoginClick();
+      return;
+    }
     if (!confirm(`Delete rule "${rule.name}"?`)) return;
     setBusy(rule.id);
     try {
-      await ownerFetch(`/api/rules/${rule.id}`, { method: "DELETE" });
+      const r = await ownerFetch(`/api/rules/${rule.id}`, { method: "DELETE" });
+      const data = await r.json();
+      if (data.commit?.commitDurationMs !== undefined) {
+        setLastCommitMs(data.commit.commitDurationMs);
+      }
       await onRefresh();
       toast.success("Rule deleted — vault re-committed");
     } catch (e: any) {
-      toast.error("Failed to delete: " + (e?.message || "unknown"));
+      if (e.message !== "Unauthorized — owner login required") {
+        toast.error("Failed to delete: " + (e?.message || "unknown"));
+      }
     } finally {
       setBusy(null);
     }
   };
 
   const addRule = async () => {
+    if (!ownerAuthenticated) {
+      onLoginClick();
+      return;
+    }
     if (!newName.trim()) {
       toast.error("Rule needs a name");
       return;
@@ -1050,19 +1273,89 @@ function RulesTab({
 
   return (
     <div className="space-y-4">
-      {/* Owner token banner */}
-      <Card className="border-amber-300/50 bg-amber-50/40 dark:border-amber-800/50 dark:bg-amber-950/10">
+      {/* T4: Tamper detection banner inside RulesTab */}
+      {tamper?.tampered && (
+        <Card className="border-red-500 bg-red-50 dark:bg-red-950/30">
+          <CardContent className="py-3 flex items-start gap-3 text-xs">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <strong className="text-red-800 dark:text-red-300">
+                RULE BOOK TAMPERING DETECTED.
+              </strong>{" "}
+              <span className="text-red-700 dark:text-red-200">
+                The current rule set in the DB doesn&apos;t match the last
+                committed hash. Someone edited rules directly in the DB,
+                bypassing <code className="font-mono">/api/rules</code>. The
+                committed policy (what should be enforced) ≠ runtime policy
+                (what is being enforced).
+              </span>
+              <div className="mt-2 font-mono text-[10px] text-red-700 dark:text-red-300 space-y-0.5">
+                <div>committed: {tamper.committedHash}</div>
+                <div>current:&nbsp;&nbsp; {tamper.currentHash}</div>
+              </div>
+              <div className="mt-2 text-[10px] text-red-700 dark:text-red-300">
+                Fix: re-commit the current rules via the API, or revert the DB
+                to match the committed hash.
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Owner authentication banner (T6) */}
+      <Card
+        className={
+          ownerAuthenticated
+            ? "border-emerald-300/50 bg-emerald-50/40 dark:border-emerald-800/50 dark:bg-emerald-950/10"
+            : "border-amber-300/50 bg-amber-50/40 dark:border-amber-800/50 dark:bg-amber-950/10"
+        }
+      >
         <CardContent className="py-3 flex items-center gap-3 text-xs">
-          <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" />
+          <Lock
+            className={
+              "h-4 w-4 flex-shrink-0 " +
+              (ownerAuthenticated
+                ? "text-emerald-600"
+                : "text-amber-600")
+            }
+          />
           <div className="flex-1">
-            <strong className="text-amber-800 dark:text-amber-300">
-              Owner role active.
-            </strong>{" "}
-            <span className="text-muted-foreground">
-              All rule edits require the <code className="font-mono">x-owner-token</code>{" "}
-              header. The chat UI (Agent role) cannot reach these endpoints —
-              the Owner/Agent trust boundary is enforced at the API layer.
-            </span>
+            {ownerAuthenticated ? (
+              <>
+                <strong className="text-emerald-800 dark:text-emerald-300">
+                  Owner role authenticated.
+                </strong>{" "}
+                <span className="text-muted-foreground">
+                  Session cookie active. All rule edits send the cookie
+                  automatically; <code className="font-mono">requireOwner()</code>{" "}
+                  middleware validates it. The Agent role (chat) cannot reach
+                  these endpoints.
+                </span>
+              </>
+            ) : (
+              <>
+                <strong className="text-amber-800 dark:text-amber-300">
+                  Owner login required to edit rules.
+                </strong>{" "}
+                <span className="text-muted-foreground">
+                  The Agent role (chat) cannot reach{" "}
+                  <code className="font-mono">/api/rules</code> — the boundary
+                  is enforced at the API layer.{" "}
+                  <button
+                    onClick={onLoginClick}
+                    className="underline text-foreground hover:text-amber-700"
+                  >
+                    Log in as owner →
+                  </button>
+                </span>
+              </>
+            )}
+            {lastCommitMs !== null && (
+              <div className="mt-1.5 text-[10px] font-mono text-muted-foreground">
+                Last commit: <strong>{(lastCommitMs / 1000).toFixed(3)}s</strong>{" "}
+                (simulated; ~1.8s on Sui testnet in production)
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -1375,7 +1668,7 @@ function ArchitectureTab() {
         <CardContent>
           <pre className="overflow-x-auto rounded-md border border-border bg-muted/30 p-4 text-[10px] font-mono leading-relaxed text-foreground/90">{`┌──────────────┐  message   ┌────────────────────┐
 │  Chat UI     │ ─────────▶ │ POST /api/agent    │  ← Agent role
-│  (Agent)     │            │   /message         │    (no owner token)
+│  (Agent)     │            │   /message         │    (no owner cookie)
 └──────────────┘            └─────────┬──────────┘
                                        │ 1. LLM parse (zod-validated)
                                        ▼
@@ -1383,17 +1676,22 @@ function ArchitectureTab() {
                                        │
                                        ▼
                             ┌────────────────────┐
-                            │ User confirms      │  ← hallucination guard
+                            │ User confirms      │  ← hallucination guard (T2)
                             │ parsed intent      │    (2-step flow)
                             └─────────┬──────────┘
                                        │ POST /api/agent/confirm
+                                       ▼
+                            1a. IDEMPOTENCY CHECK (T5)
+                                hash(msg+amount+recipient)
+                                reject if EXECUTED in last 60s
+                                       │
                                        ▼
                             2. ON-CHAIN VAULT pre-flight
                                (per_tx_cap, daily_cap)
                                        │
                                        ▼
                             3. OFF-CHAIN policy engine
-                               (allowlist, denylist, etc.)
+                               (allowlist, denylist) — zero LLM calls (T1, T3)
                                        │
                         ┌──────────────┴──────────────┐
                         ▼ fail                         ▼ pass
@@ -1403,17 +1701,32 @@ function ArchitectureTab() {
                                        ▼
                             Persist + UI live feed
 
-┌──────────────┐  edit rule ┌────────────────────┐
-│  /rules UI   │ ─────────▶ │ POST/PATCH         │  ← Owner role
-│  (Owner)     │            │  /api/rules        │    (x-owner-token)
-└──────────────┘            └─────────┬──────────┘
-                                       │ 4. Recompute SHA-256(rules JSON)
-                                       ▼
-                            5. commit_rules() on Vault object
-                               (on-chain in prod, simulated in v1)
-                                       │
-                                       ▼
-                            UI shows current commit + version`}</pre>
+┌──────────────┐  login     ┌────────────────────┐
+│  /rules UI   │ ─────────▶ │ POST /api/owner    │  ← Owner role
+│  (Owner)     │            │   /login           │    (OWNER_PASSWORD
+└──────┬───────┘            │ → session cookie   │     → signed cookie)
+       │                    └────────────────────┘
+       │ edit rule (cookie)
+       ▼
+┌────────────────────┐
+│ POST/PATCH         │  ← requireOwner() middleware
+│  /api/rules        │    validates cookie OR x-owner-token
+└─────────┬──────────┘
+          │ 5. Recompute SHA-256(rules JSON)
+          ▼
+┌────────────────────────────┐
+│ commit_rules(OwnerCap, ...) │  ← In production: Sui runtime
+│ on Vault object             │    rejects tx if OwnerCap object
+│ (simulated in v1)           │    is not included (T6 enforced
+└─────────┬───────────────────┘    at the protocol level)
+          │
+          ▼
+┌────────────────────────────┐
+│ T4: tamper detection       │  ← On every GET /api/rules:
+│ recompute hash, compare    │    recompute local hash,
+│ to last commit             │    compare to last committed,
+│ → tampered: boolean        │    show red banner if mismatch
+└────────────────────────────┘`}</pre>
           <Separator className="my-4" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div>
@@ -1445,8 +1758,19 @@ function ArchitectureTab() {
                   z-ai-web-dev-sdk (swappable)
                 </li>
                 <li>
-                  <strong className="text-foreground">Auth:</strong> Owner token
-                  (v1) → NextAuth + zkLogin (v1.1)
+                  <strong className="text-foreground">Auth:</strong> Owner
+                  password + signed session cookie (v1) → on-chain{" "}
+                  <code>OwnerCap</code> capability object (production). The
+                  chain enforces the boundary; the password is for convenience.
+                </li>
+                <li>
+                  <strong className="text-foreground">Idempotency:</strong>{" "}
+                  SHA-256 of (message + amount + recipient), 60s window (T5)
+                </li>
+                <li>
+                  <strong className="text-foreground">Tamper detection:</strong>{" "}
+                  recompute rule hash on every load, compare to last commit
+                  (T4)
                 </li>
               </ul>
             </div>
@@ -1510,7 +1834,7 @@ function ArchitectureTab() {
           <QA
             n={7}
             q="Why Move/Sui specifically? Couldn't this be any chain?"
-            a="Three Sui-specific primitives: (a) shared objects — vault::spend() is a single atomic Move transaction protected by consensus, which is what makes the race-condition prevention real; (b) Move resource safety — funds inside the vault literally cannot be moved except via the vault's entry function (impossible in Solidity's storage model); (c) sponsored transactions for v1.1 user-delegated wallets. Other chains could approximate (a) but not (b)."
+            a="Four Sui-specific primitives, with the OwnerCap being the demo-able clincher: (a) shared objects — vault::spend() is a single atomic Move transaction protected by consensus, which is what makes the race-condition prevention real; (b) Move resource safety — funds inside the vault literally cannot be moved except via the vault's entry function (impossible in Solidity's storage model); (c) sponsored transactions for v1.1 user-delegated wallets; (d) **OwnerCap capability pattern** — updating the rule registry requires POSSESSING a capability object, not passing a permission check in code. On Sui the runtime checks object ownership BEFORE your Move code runs. A tx without the OwnerCap is rejected at the protocol level. On Ethereum/Solana, 'only owner' lives in mutable app code. Try the call without the cap in a Sui CLI terminal → it gets rejected on-chain. Demo-able as fact, not asserted."
           />
           <QA
             n={8}
@@ -1525,7 +1849,7 @@ function ArchitectureTab() {
           <QA
             n={10}
             q="Who enforces the Owner/Agent boundary? What prevents POST /api/rules from another client?"
-            a="The requireOwner() middleware in src/lib/auth.ts. Every /api/rules* route calls it; it checks the x-owner-token header against the server-side OWNER_TOKEN env var. The chat UI (Agent role) doesn't have the token and cannot even attempt the call. Visible in the browser network panel during demo. v1.1 replaces this with NextAuth + zkLogin-signed sessions — but the architectural boundary is the same."
+            a="Two layers: (1) app-level — requireOwner() middleware in src/lib/auth.ts validates EITHER a signed session cookie (set by POST /api/owner/login with OWNER_PASSWORD) OR an x-owner-token header. The chat UI never logs in, so it can never reach /api/rules. Curl without cookie/token returns 401 — verified live. (2) chain-level (production) — the Move module's commit_rules() and configure() functions take `_: &OwnerCap` as their first arg. The Sui runtime rejects any tx that doesn't include the OwnerCap object BEFORE the function body runs. The app-level password is for convenience; the actual authority boundary is enforced by the chain itself."
           />
           <QA
             n={11}
