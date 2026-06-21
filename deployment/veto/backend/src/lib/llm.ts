@@ -6,7 +6,6 @@
  * through zod validation before being used anywhere downstream.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
 const SYSTEM_PROMPT = `You convert a user's plain-English request into a structured JSON action for a Sui wallet agent.
@@ -54,33 +53,76 @@ function extractJson(text: string): string | null {
 export async function parseIntent(message: string): Promise<LlmIntentResult> {
   let raw = "";
 
-  try {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return {
-        action: "unknown",
-        reason: "ANTHROPIC_API_KEY not configured on the server",
+  // If GEMINI_API_KEY is provided, call Gemini (Google Generative API style).
+  // Otherwise, fall back to Anthropic if configured.
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const endpoint =
+        process.env.GEMINI_ENDPOINT ||
+        "https://generativelanguage.googleapis.com/v1/models/gemini-1.0:generate";
+
+      const body = {
+        prompt: {
+          text: `${SYSTEM_PROMPT}\n\nUser: ${message}`,
+        },
+        // Request deterministic output
+        temperature: 0.0,
+        maxOutputTokens: 256,
       };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${geminiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        return { action: "unknown", reason: `Gemini API error: ${txt}` };
+      }
+
+      const data = await res.json();
+      // Try common response shapes
+      // Google GLM: data.candidates[0].content or data.output[0].content
+      raw =
+        data?.candidates?.[0]?.content ??
+        data?.candidates?.[0]?.content?.[0]?.text ??
+        data?.output?.[0]?.content ??
+        JSON.stringify(data);
+    } catch (e: any) {
+      return { action: "unknown", reason: `Gemini call failed: ${e?.message || "error"}` };
     }
+  } else {
+    // Fallback to Anthropic (if installed and configured)
+    try {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        return {
+          action: "unknown",
+          reason: "No LLM provider configured (set GEMINI_API_KEY or ANTHROPIC_API_KEY)",
+        };
+      }
 
-    const client = new Anthropic({ apiKey });
-    const response = await client.messages.create({
-      model: "claude-3-5-sonnet-20241022",
-      max_tokens: 256,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: message }],
-    });
+      // Dynamically import Anthropic to avoid hard dependency when using Gemini.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const Anthropic = require("@anthropic-ai/sdk");
+      const client = new Anthropic({ apiKey });
+      const response = await client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 256,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: message }],
+      });
 
-    // Extract text from response (type-narrow to TextBlock)
-    const textBlock = response.content.find(
-      (b): b is Anthropic.TextBlock => b.type === "text"
-    );
-    raw = textBlock?.text ?? "";
-  } catch (e: any) {
-    return {
-      action: "unknown",
-      reason: `LLM call failed: ${e?.message || "unknown error"}`,
-    };
+      const textBlock = response.content.find((b: any) => b.type === "text");
+      raw = textBlock?.text ?? "";
+    } catch (e: any) {
+      return { action: "unknown", reason: `LLM call failed: ${e?.message || "unknown error"}` };
+    }
   }
 
   const cleaned = stripFences(raw);

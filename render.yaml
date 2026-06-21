@@ -1,0 +1,20 @@
+# Example Render service definition (reference) - adjust before use
+services:
+  - type: web
+    name: veto-backend
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: "npm install && npx prisma generate && npm run build"
+    startCommand: "npm start"
+    repo: https://github.com/Nithi007007/Veto
+    branch: main
+    envVars:
+      - key: DATABASE_URL
+        value: "$DATABASE_URL"
+      - key: GEMINI_API_KEY
+        fromDatabase: false
+      - key: ANTHROPIC_API_KEY
+        fromDatabase: false
+      - key: SUI_AGENT_SECRET_KEY
+        fromDatabase: false
