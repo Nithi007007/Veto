@@ -13,21 +13,27 @@ const SEED_RULES = [
   {
     name: "Per-transaction cap",
     type: "MAX_AMOUNT_PER_TX",
-    config: JSON.stringify({ maxAmountSui: 5 }),
+    config: { maxAmountSui: 5 },
   },
   {
     name: "Daily spend cap",
     type: "DAILY_SPEND_CAP",
-    config: JSON.stringify({ capSui: 20 }),
+    config: { capSui: 20 },
   },
   {
     name: "Known-bad address blocklist",
     type: "DENYLIST_ADDRESS",
-    config: JSON.stringify({
+    config: {
       addresses: ["0x0000000000000000000000000000000000000000000000000000000000000bad"],
-    }),
+    },
   },
 ];
+
+// SQLite provider expects config as a JSON string; Postgres Json expects an object.
+function configForProvider(obj: Record<string, any>): unknown {
+  const isSqlite = (process.env.DATABASE_URL || "").startsWith("file:");
+  return isSqlite ? JSON.stringify(obj) : obj;
+}
 
 export async function POST() {
   const existing = await db.rule.count();
@@ -45,7 +51,13 @@ export async function POST() {
   }
 
   for (const rule of SEED_RULES) {
-    await db.rule.create({ data: rule });
+    await db.rule.create({
+      data: {
+        name: rule.name,
+        type: rule.type,
+        config: configForProvider(rule.config) as any,
+      },
+    });
   }
 
   // Create the initial vault commit

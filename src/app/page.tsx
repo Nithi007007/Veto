@@ -72,7 +72,7 @@ type Rule = {
     | "DAILY_SPEND_CAP"
     | "ALLOWED_RECIPIENT"
     | "DENYLIST_ADDRESS";
-  config: string;
+  config: unknown; // Postgres returns parsed object; SQLite returned JSON string
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -150,12 +150,18 @@ function formatTime(iso: string): string {
   });
 }
 
-function parseConfig(configStr: string): Record<string, any> {
-  try {
-    return JSON.parse(configStr);
-  } catch {
-    return {};
+function parseConfig(configStr: unknown): Record<string, any> {
+  // Postgres Json returns a parsed object; legacy SQLite returned a JSON string.
+  if (configStr == null) return {};
+  if (typeof configStr === "object") return configStr as Record<string, any>;
+  if (typeof configStr === "string") {
+    try {
+      return JSON.parse(configStr);
+    } catch {
+      return {};
+    }
   }
+  return {};
 }
 
 function mistToSui(mist: string | bigint): number {

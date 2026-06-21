@@ -18,7 +18,9 @@ export type Rule = {
   id: string;
   name: string;
   type: RuleType;
-  config: string; // raw JSON string from DB
+  // Postgres Json type returns a parsed object; legacy SQLite returned a JSON string.
+  // Treat as unknown and parse defensively at use sites.
+  config: unknown;
   enabled: boolean;
   createdAt: Date;
   updatedAt: Date;

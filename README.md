@@ -223,7 +223,8 @@ bun install
 # Set up environment
 cp .env.example .env  # then edit values
 
-# Push DB schema
+# (Local dev only) Switch to SQLite schema for offline dev
+./scripts/switch-db.sh sqlite
 bun run db:push
 
 # Run dev server
@@ -232,11 +233,56 @@ bun run dev
 
 Open `http://localhost:3000` — the app auto-seeds three default rules + initial vault commit on first load.
 
+### 🚨 Before deploying to Vercel: switch to Postgres
+
+**SQLite does NOT work on Vercel.** Serverless functions get a fresh filesystem on
+every request — a SQLite file written to disk doesn't persist. Your rule book and
+history will silently reset in production even though everything works on localhost.
+
+```bash
+# 1. Create a free Postgres instance at https://neon.tech
+# 2. Set DATABASE_URL in .env to the pooled Neon connection string
+# 3. Switch the active schema to Postgres + push
+./scripts/switch-db.sh postgres
+bun run db:push
+
+# 4. Run the pre-deploy check (catches SQLite + missing env vars)
+./scripts/pre-deploy-check.sh
+```
+
+Then commit the Postgres `prisma/schema.prisma` to your repo before pushing to GitHub
+for Vercel import.
+
+## Tests
+
+```bash
+# Unit tests for the policy engine (pure functions, no DB or network)
+bun run test
+
+# API smoke test (requires dev server running on localhost:3000)
+bun run test:api
+
+# Watch mode
+bun run test:watch
+```
+
+The policy-engine test suite (`tests/policy-engine.test.ts`) imports the REAL
+`evaluateRule` and `runPolicyEngine` from `src/lib/policy-engine.ts` — if the tests
+pass, the engine is correct against the spec. 19 tests, all passing.
+
+The API smoke test (`tests/api-test.sh`) verifies all 6 threat mitigations end-to-end:
+T6 (auth), T4 (tamper detection), T5 (idempotency), the on-chain vault block path,
+and the two-step confirmation flow. 10/10 passing against localhost.
+
+The manual test checklist (`tests/manual-test-checklist.md`) covers everything that
+needs a browser or real chain state, with the SQLite-on-Vercel warning placed at the
+top so it gets caught first.
+
 ## Environment variables
 
 | Variable | Description | Example |
 |---|---|---|
-| `DATABASE_URL` | SQLite or Postgres connection string | `file:./db/veto.db` |
+| `DATABASE_URL` | SQLite (`file:`) for local dev OR Postgres (`postgresql://`) for production | `postgresql://user:pass@host/db?sslmode=require` |
 | `SUI_AGENT_SECRET_KEY` | Ed25519 private key for the agent's testnet wallet | `suiprivkey1q...` |
 | `SUI_NETWORK` | Sui network to use | `testnet` |
 | `OWNER_PASSWORD` | Password for `POST /api/owner/login` (sets session cookie) | `dev-owner-password` |

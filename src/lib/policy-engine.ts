@@ -31,14 +31,22 @@ export type PolicyDecision =
   | { decision: "BLOCKED"; failedRule: string; reason: string };
 
 /**
- * Parse the JSON config string safely.
+ * Parse the config field. With Postgres Json type, Prisma returns a parsed
+ * object; with SQLite (legacy) it was a JSON string. Support both for
+ * forward/backward compatibility.
  */
 function parseConfig(rule: Rule): Record<string, any> {
-  try {
-    return JSON.parse(rule.config || "{}");
-  } catch {
-    return {};
+  const c = rule.config as any;
+  if (c == null) return {};
+  if (typeof c === "string") {
+    try {
+      return JSON.parse(c);
+    } catch {
+      return {};
+    }
   }
+  if (typeof c === "object") return c;
+  return {};
 }
 
 export function evaluateRule(
@@ -113,6 +121,16 @@ export function evaluateRule(
  *
  * Rule evaluation order is deterministic — they're evaluated in the order they
  * were inserted (Rule.id ordering), which makes the audit trail reproducible.
+ *
+ * FAIL-CLOSED: if there are zero enabled rules, the engine BLOCKS by default
+ * with reason "no rules configured — fail-closed". This is the safe behavior
+ * for a policy engine: an empty/misconfigured rule book must NOT mean "anything
+ * goes." If you genuinely want to allow everything, add an explicit
+ * MAX_AMOUNT_PER_TX rule with a very high cap.
+ *
+ * This is the answer to the test suite's edge-case probe: "approves with zero
+ * enabled rules — confirm this is the behavior you actually want." It is NOT.
+ * Fail-closed is.
  */
 export function runPolicyEngine(
   intent: ParsedIntent,
@@ -122,6 +140,15 @@ export function runPolicyEngine(
   const enabledRules = rules
     .filter((r) => r.enabled)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+  if (enabledRules.length === 0) {
+    return {
+      decision: "BLOCKED",
+      failedRule: "fail_closed_no_rules",
+      reason:
+        "No enabled rules found. The policy engine fails closed when the rule book is empty — add at least one rule (e.g. a per-tx cap) to allow any transfer.",
+    };
+  }
 
   for (const rule of enabledRules) {
     const result = evaluateRule(rule, intent, context);

@@ -497,3 +497,38 @@ Stage Summary:
 - 3-buyer story + open-core monetization explicitly stated in README
 - Evidence table in README maps every claim to a live proof
 - Screenshots: /home/z/my-project/download/veto_v3_dashboard.png + veto_v3_tamper_banner.png
+
+---
+Task ID: VETO-V4-TESTS-AND-DB-FIX
+Agent: Super Z (main)
+Task: Fix SQLite-on-Vercel bug + drop in user-provided test files + address fail-closed edge case
+
+Work Log:
+- CRITICAL FIX: Split prisma/schema.prisma into two: schema.postgres.prisma (production) and schema.sqlite.prisma (local dev). Active schema is sqlite for current dev; postgres is the deploy target.
+- Added scripts/switch-db.sh to swap between providers + scripts/pre-deploy-check.sh that fails loudly if SQLite is active or DATABASE_URL isn't postgresql://
+- Made all DB writes provider-aware (buildConfigValue returns string for SQLite, object for Postgres — detected via DATABASE_URL scheme at runtime)
+- Updated src/lib/types.ts: Rule.config type changed from string → unknown (handles both)
+- Updated src/lib/policy-engine.ts parseConfig() to handle both string (SQLite) and object (Postgres) config values
+- Updated src/lib/vault.ts computeRulesHash() to handle both forms
+- Updated src/app/page.tsx parseConfig() to handle both forms
+- Addressed the fail-closed edge case flagged by the user's test suite: runPolicyEngine now BLOCKS with failedRule="fail_closed_no_rules" when zero enabled rules exist (instead of silently APPROVE-everything). This is the security-correct behavior.
+- Dropped in user-provided tests/policy-engine.test.ts, replaced reference implementation with REAL imports from src/lib/policy-engine.ts. Updated the "approves with zero enabled rules" test to expect BLOCKED instead of APPROVED (matching the new fail-closed behavior).
+- Dropped in user-provided tests/api-test.sh, fixed route names: /api/auth/login → /api/owner/login, /api/auth/logout → /api/owner/logout. Added step [10] for T4 tamper detection + step [11] for cleanup (delete smoke-test rule).
+- Dropped in user-provided tests/manual-test-checklist.md, expanded with: SQLite warning at the top (as the user requested), fail-closed edge case verification steps, both SQLite and Postgres tamper-mutation commands, pre-deploy-check.sh reference, and a final pre-submission smoke test section.
+- Added vitest as dev dependency, created vitest.config.ts with @/ path alias.
+- Added bun run scripts: test, test:watch, test:api, pre-deploy, db:switch-postgres, db:switch-sqlite.
+
+Verified:
+- bun run test → 19/19 passing (policy-engine unit tests, real imports)
+- bun run test:api → 10/10 passing against localhost (all 6 threat mitigations: T4, T5, T6, on-chain vault block, two-step confirmation, fail-closed)
+- bun run lint → clean
+- Fail-closed behavior verified end-to-end via curl: disabled all rules → submitted transfer → got BLOCKED with failedRule="fail_closed_no_rules" and clear reason. Re-enabled rules → transfers work again.
+- pre-deploy-check.sh correctly catches SQLite (fails with clear error message) and missing env vars.
+
+Stage Summary:
+- Live URL: https://preview-<bot-id>.space-z.ai/
+- All 3 user-provided test files dropped into tests/ folder with route fixes + fail-closed assertion update
+- Critical SQLite-on-Vercel bug fixed: schema is now Postgres for production (Vercel-safe), SQLite only for local dev (with switch-db.sh to swap)
+- Fail-closed edge case addressed: zero enabled rules → BLOCKED (was APPROVED before — security hole)
+- Test infrastructure: 19 unit tests + 10 API smoke tests + manual checklist, all passing
+- Deployment safety: pre-deploy-check.sh catches SQLite + missing env vars before you push to Vercel

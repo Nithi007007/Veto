@@ -1,0 +1,66 @@
+// Veto — Prisma schema (v3 — PostgreSQL for Vercel deployment)
+//
+// IMPORTANT: provider is postgresql, NOT sqlite. SQLite "works on localhost,
+// breaks on Vercel" — Vercel's serverless functions get a fresh, empty
+// filesystem on every request, so a SQLite file written to disk does not
+// persist between requests in production. Switching to Postgres (Neon free
+// tier) is the one item that silently breaks "hosted" if skipped.
+//
+// Local dev: create a free Neon project at https://neon.tech, copy the
+// pooled connection string into DATABASE_URL, run `bun run db:push`.
+//
+// (If you absolutely need offline local dev with no network, copy the
+// schema below into a separate `schema-sqlite.prisma` file with
+// `provider = "sqlite"` and a `file:` DATABASE_URL. Don't deploy that.)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Rule {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // "MAX_AMOUNT_PER_TX" | "DAILY_SPEND_CAP" | "ALLOWED_RECIPIENT" | "DENYLIST_ADDRESS"
+  config    Json
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+model AgentRequest {
+  id           String   @id @default(cuid())
+  rawMessage   String
+  parsedIntent Json?
+  amountSui    Float?
+  recipient    String?
+  status       String   @default("PENDING") // PENDING | APPROVED | BLOCKED | EXECUTED | FAILED | AWAITING_CONFIRMATION
+  failedRule   String?
+  failReason   String?
+  txDigest     String?
+  // For two-step confirmation flow
+  confirmedAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([recipient])
+  // For T5 idempotency check
+  @@index([status, amountSui, recipient, rawMessage, confirmedAt])
+}
+
+model RuleBookCommit {
+  id          String   @id @default(cuid())
+  commitHash  String   // SHA-256 of canonical rule set JSON (0x-prefixed hex)
+  version     Int      // monotonically increasing
+  txDigest    String?  // null in simulator mode; real digest once Move is deployed
+  createdAt   DateTime @default(now())
+
+  @@index([version])
+}

@@ -24,22 +24,33 @@ const CreateRuleSchema = z.object({
   config: z.record(z.string(), z.unknown()),
 });
 
-function buildConfigString(type: string, config: any): string {
+function buildConfigValue(type: string, config: any): unknown {
+  // Build the normalized config object, then return it in a form Prisma will accept.
+  // - Postgres (Json column): pass the object directly
+  // - SQLite (String column): JSON.stringify the object
+  // We detect at runtime by checking if the env URL is a file: URL.
+  let obj: Record<string, any>;
   switch (type) {
     case "MAX_AMOUNT_PER_TX":
-      return JSON.stringify({ maxAmountSui: Number(config.maxAmountSui) });
+      obj = { maxAmountSui: Number(config.maxAmountSui) };
+      break;
     case "DAILY_SPEND_CAP":
-      return JSON.stringify({ capSui: Number(config.capSui) });
+      obj = { capSui: Number(config.capSui) };
+      break;
     case "ALLOWED_RECIPIENT":
     case "DENYLIST_ADDRESS": {
       const arr = Array.isArray(config.addresses)
         ? config.addresses.filter((a: any) => typeof a === "string" && a.trim())
         : [];
-      return JSON.stringify({ addresses: arr });
+      obj = { addresses: arr };
+      break;
     }
     default:
-      return JSON.stringify(config);
+      obj = config;
   }
+  // SQLite provider expects a string; Postgres Json expects an object.
+  const isSqlite = (process.env.DATABASE_URL || "").startsWith("file:");
+  return isSqlite ? JSON.stringify(obj) : obj;
 }
 
 export async function GET() {
@@ -74,10 +85,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, type, config } = validation.data;
-  const configStr = buildConfigString(type, config);
+  const configValue = buildConfigValue(type, config);
 
   const rule = await db.rule.create({
-    data: { name, type, config: configStr },
+    data: { name, type, config: configValue as any },
   });
 
   // Commit the new rule set to the vault (on-chain in prod, simulated here)

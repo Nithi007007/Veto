@@ -17,22 +17,29 @@ const PatchSchema = z.object({
   config: z.record(z.string(), z.unknown()).optional(),
 });
 
-function buildConfigString(type: string, config: any): string {
+function buildConfigValue(type: string, config: any): unknown {
+  let obj: Record<string, any>;
   switch (type) {
     case "MAX_AMOUNT_PER_TX":
-      return JSON.stringify({ maxAmountSui: Number(config.maxAmountSui) });
+      obj = { maxAmountSui: Number(config.maxAmountSui) };
+      break;
     case "DAILY_SPEND_CAP":
-      return JSON.stringify({ capSui: Number(config.capSui) });
+      obj = { capSui: Number(config.capSui) };
+      break;
     case "ALLOWED_RECIPIENT":
     case "DENYLIST_ADDRESS": {
       const arr = Array.isArray(config.addresses)
         ? config.addresses.filter((a: any) => typeof a === "string" && a.trim())
         : [];
-      return JSON.stringify({ addresses: arr });
+      obj = { addresses: arr };
+      break;
     }
     default:
-      return JSON.stringify(config);
+      obj = config;
   }
+  // SQLite provider expects a string; Postgres Json expects an object.
+  const isSqlite = (process.env.DATABASE_URL || "").startsWith("file:");
+  return isSqlite ? JSON.stringify(obj) : obj;
 }
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -71,7 +78,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     update.name = validation.data.name;
   }
   if (validation.data.config) {
-    update.config = buildConfigString(existing.type, validation.data.config);
+    update.config = buildConfigValue(existing.type, validation.data.config);
   }
 
   const updated = await db.rule.update({ where: { id }, data: update });

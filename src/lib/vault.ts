@@ -180,7 +180,17 @@ export function computeRulesHash(rules: Rule[]): string {
   const canonical = enabled.map((r) => ({
     name: r.name,
     type: r.type,
-    config: JSON.parse(r.config || "{}"),
+    // Postgres returns config as a parsed object; SQLite returned a JSON string.
+    config:
+      typeof r.config === "string"
+        ? (() => {
+            try {
+              return JSON.parse(r.config || "{}");
+            } catch {
+              return {};
+            }
+          })()
+        : r.config ?? {},
   }));
   const jsonStr = JSON.stringify(canonical);
   return "0x" + createHash("sha256").update(jsonStr).digest("hex");
